@@ -1,0 +1,28 @@
+{
+  "name": "angular-borderlayout",
+  "version": "0.4.0",
+  "authors": [
+    "Geoff Goodman"
+  ],
+  "description": "A set of Angular.js components to manage and define border layouts",
+  "main": "src/borderLayout.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "angular"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/filearts/angular-borderlayout",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "coffee-script": "~1.7.1",
+    "less": "~1.7.0"
+  }
+}
