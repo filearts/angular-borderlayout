@@ -4,6 +4,8 @@
   "description": "A set of Angular.js components to manage and define border layouts",
   "main": "src/borderLayout.js",
   "scripts": {
+    "postpublish": "rm ./src/borderLayout.js ./src/borderLayout.css",
+    "prepublish": "./node_modules/.bin/coffee -c ./src/borderLayout.coffee && ./node_modules/.bin/lessc ./src/borderLayout.less ./src/borderLayout.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/filearts/angular-borderlayout/issues"
   },
-  "homepage": "https://github.com/filearts/angular-borderlayout"
+  "homepage": "https://github.com/filearts/angular-borderlayout",
+  "devDependencies": {
+    "coffee-script": "^1.7.1",
+    "less": "^1.7.0"
+  }
 }

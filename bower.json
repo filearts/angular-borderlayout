@@ -20,5 +20,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "devDependencies": {
+    "coffee-script": "~1.7.1",
+    "less": "~1.7.0"
+  }
 }
