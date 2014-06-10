@@ -5,7 +5,7 @@
     "Geoff Goodman"
   ],
   "description": "A set of Angular.js components to manage and define border layouts",
-  "main": "src/borderLayout.js",
+  "main": ["src/borderLayout.js", "src/borderLayout.css"],
   "moduleType": [
     "globals"
   ],
