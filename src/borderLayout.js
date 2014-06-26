@@ -2,7 +2,7 @@
 (function() {
   var module,
     __slice = [].slice;
-
+  var faDragged = false; //fix dragging on toggle
   module = angular.module("fa.directive.borderLayout", []);
 
   module.factory("paneManager", function() {
@@ -491,6 +491,10 @@
             };
 
             Pane.prototype.toggle = function(open) {
+              if (faDragged) { //fix for dragging on toggle
+                faDragged = false;
+                return Pane;
+              }
               var reflow;
               if (open == null) {
                 open = !!$pane.closed;
@@ -682,6 +686,7 @@
             e.defaultPrevented = true;
             e = null;
             handleMouseMove = function(e) {
+              faDragged = true; //fix for dragging on toggle
               $pane.$onStartResize();
               $scope.$apply(function() {
                 var targetSize;
