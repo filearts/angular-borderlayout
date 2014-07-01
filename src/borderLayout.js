@@ -519,7 +519,7 @@
               $pane.$region = region.clone();
               $pane.reflowChildren(region.getInnerRegion());
 
-              return $pane.$transcludeScope.$broadcast("fa-pane-resize", $pane);
+              $rootScope.$broadcast("fa-pane-resize", $pane);
             };
 
             Pane.prototype.reflowChildren = function(region) {
