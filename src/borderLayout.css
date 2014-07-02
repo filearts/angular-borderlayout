@@ -14,11 +14,12 @@
   bottom: 0;
   left: 0;
 }
+
 .fa-pane-scroller {
   overflow: auto;
 }
 
-.fa-pane.fa-pane-closed>.fa-pane-scroller {
+.fa-pane.fa-pane-closed > .fa-pane-scroller {
   display: none;
 }
 
@@ -27,23 +28,23 @@
   z-index: 9999;
 }
 
-.fa-pane-resizing>.fa-pane-overlay {
+.fa-pane-resizing > .fa-pane-overlay {
   display: block;
 }
 
-.fa-pane-resizing ~ .fa-pane>.fa-pane-overlay {
+.fa-pane-resizing ~ .fa-pane > .fa-pane-overlay {
   display: block;
 }
 
-.fa-pane-orientation-vertical>.fa-pane-handle {
+.fa-pane-orientation-vertical > .fa-pane-handle {
   cursor: row-resize;
 }
 
-.fa-pane-orientation-horizontal>.fa-pane-handle {
+.fa-pane-orientation-horizontal > .fa-pane-handle {
   cursor: col-resize;
 }
 
-.fa-pane-orientation-horizontal>.fa-pane-handle>.fa-pane-toggle {
+.fa-pane-orientation-horizontal > .fa-pane-handle > .fa-pane-toggle {
   margin: auto;
   position: absolute;
   top: 0;
@@ -55,7 +56,7 @@
   cursor: pointer;
 }
 
-.fa-pane-orientation-vertical>.fa-pane-handle>.fa-pane-toggle {
+.fa-pane-orientation-vertical > .fa-pane-handle > .fa-pane-toggle {
   margin: auto;
   position: absolute;
   top: 0;
@@ -67,6 +68,6 @@
   cursor: pointer;
 }
 
-.fa-pane-closed>.fa-pane-scroller {
+.fa-pane-closed > .fa-pane-scroller {
   display: none;
 }
