@@ -285,20 +285,17 @@
           '</div>',
         controllerAs: "$pane",
         controller: function() {
-          var $pane, Pane;
+          var $pane = this;
 
-          return $pane = new (Pane = (function() {
-            function Pane() {
-              this.children = [];
-              this.closed = false;
-              this.noToggle = false;
-              this.max = Number.MAX_VALUE;
-              this.min = 0;
-            }
-
+          return angular.extend(this, {
+            children: [],
+            closed: false,
+            noToggle: false,
+            max: Number.MAX_VALUE,
+            min: 0,
             // Schedule a re-flow later in the digest cycle, but do not reflow
             // more than necessary
-            Pane.prototype.$scheduleReflow = function() {
+            $scheduleReflow: function() {
               if ($pane.parent) {
                 return $pane.parent.$scheduleReflow();
               } else if (!$pane.$reflowScheduled) {
@@ -312,25 +309,22 @@
                   return $pane.$reflowScheduled = false;
                 });
               }
-            };
-
-            Pane.prototype.$onStartResize = function() {
+            },
+            $onStartResize: function() {
               if ($pane.$parent) {
                 return $pane.parent.$containerEl.addClass("fa-pane-resizing");
               } else {
                 return $pane.$containerEl.addClass("fa-pane-resizing");
               }
-            };
-
-            Pane.prototype.$onStopResize = function() {
+            },
+            $onStopResize: function() {
               if ($pane.$parent) {
                 return $pane.parent.$containerEl.removeClass("fa-pane-resizing");
               } else {
                 return $pane.$containerEl.removeClass("fa-pane-resizing");
               }
-            };
-
-            Pane.prototype.getOptions = function() {
+            },
+            getOptions: function() {
               return {
                 anchor: this.anchor,
                 targetSize: this.targetSize,
@@ -345,9 +339,8 @@
                 noToggle: !!this.noToggle,
                 closed: this.closed
               };
-            };
-
-            Pane.prototype.setOptions = function(options) {
+            },
+            setOptions: function(options) {
               if (options == null) {
                 options = {};
               }
@@ -375,45 +368,38 @@
               if (options.closed != null) {
                 return this.toggle(!options.closed);
               }
-            };
-
-            Pane.prototype.setAnchor = function(anchor) {
+            },
+            setAnchor: function(anchor) {
               this.anchor = anchor;
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.setTargetSize = function(targetSize) {
+            },
+            setTargetSize: function(targetSize) {
               this.targetSize = targetSize;
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.setMinSize = function(min) {
+            },
+            setMinSize: function(min) {
               this.min = min;
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.setMaxSize = function(max) {
+            },
+            setMaxSize: function(max) {
               this.max = max;
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.setOrder = function(order) {
+            },
+            setOrder: function(order) {
               this.order = order;
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.setNoToggle = function(noToggle) {
+            },
+            setNoToggle: function(noToggle) {
               this.noToggle = noToggle;
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.setHandleSize = function(handleSize) {
+            },
+            setHandleSize: function(handleSize) {
               if ((handleSize != null ? handleSize.open : void 0) ||
                 (handleSize != null ? handleSize.closed : void 0)) {
 
@@ -424,9 +410,8 @@
               }
 
               return this.$scheduleReflow();
-            };
-
-            Pane.prototype.addChild = function(child) {
+            },
+            addChild: function(child) {
               child.parent = $pane;
               this.children.push(child);
 
@@ -435,23 +420,19 @@
               }
 
               return $pane.$scheduleReflow();
-            };
-
-            Pane.prototype.getOrientation = function() {
+            },
+            getOrientation: function() {
               return getOrientation($pane.anchor);
-            };
-
-            Pane.prototype.onHandleDown = function() {
+            },
+            onHandleDown: function() {
               return $pane.$containerEl.addClass("active");
-            };
-
-            Pane.prototype.onHandleUp = function() {
+            },
+            onHandleUp: function() {
               $pane.$containerEl.removeClass("active");
 
               return $pane.$scheduleReflow();
-            };
-
-            Pane.prototype.removeChild = function(child) {
+            },
+            removeChild: function(child) {
               var idx;
 
               if (!(0 > (idx = this.children.indexOf(child)))) {
@@ -463,9 +444,8 @@
               }
 
               return $pane.$scheduleReflow();
-            };
-
-            Pane.prototype.reflow = function(region) {
+            },
+            reflow: function(region) {
               var width = $pane.$containerEl[0].offsetWidth;
               var height = $pane.$containerEl[0].offsetHeight;
 
@@ -482,7 +462,7 @@
                 $pane.$containerEl.addClass("fa-pane-orientation-" + orientation);
 
                 var handleSize = region.calculateSize(orientation, !$pane.closed &&
-                  $pane.handleSizeOpen || $pane.handleSizeClosed);
+                $pane.handleSizeOpen || $pane.handleSizeClosed);
 
                 var size = handleSize;
                 if (!$pane.closed) {
@@ -520,9 +500,8 @@
               $pane.reflowChildren(region.getInnerRegion());
 
               $rootScope.$broadcast("fa-pane-resize", $pane);
-            };
-
-            Pane.prototype.reflowChildren = function(region) {
+            },
+            reflowChildren: function(region) {
               region || (region = $pane.$region);
 
               $pane.children.sort(function(a, b) {
@@ -537,10 +516,8 @@
               }
 
               return results;
-            };
-
-            // Attempt to resize
-            Pane.prototype.resize = function(size) {
+            },
+            resize: function(size) {
               if (size == null) {
                 size = $pane.targetSize;
               }
@@ -553,9 +530,8 @@
               } else {
                 return $pane.$containerEl.removeClass("fa-pane-constrained");
               }
-            };
-
-            Pane.prototype.toggle = function(open) {
+            },
+            toggle: function(open) {
               // Fix for dragging on toggle
               if (faDragged) {
                 faDragged = false;
@@ -583,10 +559,8 @@
               }
 
               return reflow();
-            };
-
-            return Pane;
-          })());
+            }
+          });
         },
         compile: function($el, $attrs, $transclude) {
           // Tool used to force elements into their compile order
@@ -668,7 +642,8 @@
 
               $pane.$directiveScope.$on("fa-pane-attach", function(e, child) {
                 if (child !== $pane) {
-                  e.stopPropagation();
+
+                 e.stopPropagation();
                   return $pane.addChild(child);
                 }
               });
