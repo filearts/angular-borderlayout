@@ -535,7 +535,7 @@
               // Fix for dragging on toggle
               if (faDragged) {
                 faDragged = false;
-                return Pane;
+                return $pane;
               }
 
               if (open == null) {
