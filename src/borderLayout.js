@@ -1,4 +1,14 @@
-(function () {
+(function (root, factory) {
+
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(['angular', '_'], factory);
+	} else {
+		factory(angular, root._);
+	}
+
+}(this, function (angular, _) {
+
 	var module = angular.module("fa.directive.borderLayout", []);
 
 	var faDragged = false; // Fix dragging on toggle
@@ -689,22 +699,11 @@
 	module.directive("faPaneResizer", [
 		"$window", function ($window) {
 
-			var throttle = function (delay, fn) {
-				var throttled = false;
 
-				return function () {
-					if (throttled) {
 						return;
 					}
-					throttled = true;
 
-					setTimeout(function () {
-						return throttled = false;
-					}, delay);
 
-					return fn.call.apply(fn, [this].concat([].slice.call(arguments)));
-				};
-			};
 
 			return {
 				restrict: "A",
@@ -837,4 +836,5 @@
 		}
 	]);
 
-}).call(this);
+	return module
+}));
