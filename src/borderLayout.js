@@ -2,8 +2,15 @@
 
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
-		define(['angular', '_'], factory);
+		define(['angular', 'underscore'], factory);
+	} else if (typeof module === 'object' && module.exports) {
+		// Node. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		// to support bundler like browserify
+		module.exports = factory(require('angular'), require('underscore'));
 	} else {
+		// Browser globals (root is window)
 		factory(angular, root._);
 	}
 
@@ -677,6 +684,10 @@
 							});
 
 							$paneCtrl.$directiveScope.$on("$stateChangeSuccess", function () {
+								$paneCtrl.$scheduleReflow();
+							});
+
+							$paneCtrl.$directiveScope.$on("$viewContentLoaded", function () {
 								$paneCtrl.$scheduleReflow();
 							});
 
