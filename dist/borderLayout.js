@@ -185,7 +185,7 @@
 
     })
 
-	module.directive("faPane", function ($window, $rootScope, paneManager, Region) {
+	module.directive("faPane", ["$window", "$rootScope", "paneManager", "Region", function ($window, $rootScope, paneManager, Region) {
 
 
 			var getOrientation = function (anchor) {
@@ -295,7 +295,7 @@
 					order: "@paneOrder",
 					noToggle: "@paneNoToggle"
 				},
-				templateUrl: 'template/borderLayout.tpl.html',
+				templateUrl: '../../src/borderLayout.tpl.html',
 				controllerAs: "$pane",
 				controller: function () {
 					angular.extend(this, {
@@ -695,20 +695,23 @@
 					};
 				}
 			};
-		}
+		}]
 	);
 
 	// not used
-	module.directive("faPaneToggle", function (paneManager) {
+	module.directive("faPaneToggle", [
+		"paneManager",
+		function (paneManager) {
 			return {
 				link: function ($scope, $el, $attrs) {
 					$attrs.$observe("faPaneToggle", function (paneId) {
 					});
 				}
 			};
-		});
+		}
+	]);
 
-	module.directive("faPaneResizer", function ($window) {
+	module.directive("faPaneResizer", ["$window", function ($window) {
 
 		return {
 			restrict: "A",
@@ -836,9 +839,10 @@
 				});
 			}
 		};
-	});
+	}
+	]);
 
-	/*the place to place the generated angular templateCache*/
+	angular.module("fa.directive.borderLayout").run(["$templateCache", function($templateCache) {$templateCache.put("template/borderLayout.tpl.html","<div class=\"fa-pane pane-{{$pane.id}}\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" ng-click=\"$pane.toggle()\"></div> </div> </div>");}]);
 
 	return module
 }));

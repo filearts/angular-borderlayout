@@ -1,5 +1,5 @@
 var app = angular.module('app',
-  ["fa.directive.borderLayout", "ngAnimate", "ngRoute"]);
+  ["fa.directive.borderLayout", "ngRoute"]);
 
 app.config(function ($routeProvider) {
   $routeProvider.when("/", {

@@ -4,26 +4,25 @@
     <meta charset="utf-8"/>
     <title>Angular BorderLayout Sample</title>
     <link rel="stylesheet"
-          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="../../src/borderLayout.css"/>
+          href="../../bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../../dist/borderLayout.css"/>
     <link rel="stylesheet" href="style.css"/>
     <script src="../../bower_components/angular/angular.js"></script>
-    <script src="../../bower_components/angular-animate/angular-animate.js"></script>
     <script src="../../bower_components/angular-route/angular-route.js"></script>
 	<script src="../../bower_components/underscore/underscore.js"></script>
-    <script src="../../src/borderLayout.js"></script>
+    <script src="../../dist/borderLayout.js"></script>
     <script src="app.js"></script>
 </head>
 
 <body ng-controller="MainCtrl">
 <div fa-pane="">
-    <div fa-pane pane-anchor="north" pane-size="56px" pane-handle="4">
+    <div fa-pane="1.1" pane-anchor="north" pane-size="56px" pane-handle="4">
         <ul class="nav navbar-nav">
             <li><a href="#/home">Home</a></li>
             <li><a href="#/about">About</a></li>
         </ul>
     </div>
-    <div fa-pane pane-anchor="center">
+    <div fa-pane="1.2" pane-anchor="center">
         <div ng-view></div>
     </div>
 </div>
