@@ -183,85 +183,9 @@
 
         return Region;
 
-    })
+    });
 
-	module.directive("faPane", ["$window", "$rootScope", "paneManager", "Region", function ($window, $rootScope, paneManager, Region) {
-
-
-			var getOrientation = function (anchor) {
-				switch (anchor) {
-					case "north":
-					case "south":
-						return "vertical";
-					case "east":
-					case "west":
-						return "horizontal";
-				}
-			};
-
-			var getScrollerStyle = function (anchor, size) {
-				var style = {
-					top: 0,
-					right: 0,
-					bottom: 0,
-					left: 0
-				};
-
-				if (size) {
-					switch (anchor) {
-						case "north":
-							style.bottom = "auto";
-							style.height = "" + size + "px";
-							break;
-						case "east":
-							style.left = "auto";
-							style.width = "" + size + "px";
-							break;
-						case "south":
-							style.top = "auto";
-							style.height = "" + size + "px";
-							break;
-						case "west":
-							style.right = "auto";
-							style.width = "" + size + "px";
-					}
-				}
-
-				return style;
-			};
-
-			var getHandleStyle = function (anchor, region, handleSize) {
-				switch (anchor) {
-					case "north":
-						return {
-							height: region.calculateSize('vertical', handleSize) + "px",
-							right: 0,
-							left: 0,
-							bottom: 0
-						};
-					case "south":
-						return {
-							height: region.calculateSize('vertical', handleSize) + "px",
-							right: 0,
-							left: 0,
-							top: 0
-						};
-					case "east":
-						return {
-							width: region.calculateSize('horizontal', handleSize) + "px",
-							top: 0,
-							bottom: 0,
-							left: 0
-						};
-					case "west":
-						return {
-							width: region.calculateSize('horizontal', handleSize) + "px",
-							top: 0,
-							bottom: 0,
-							right: 0
-						};
-				}
-			};
+	module.directive("faPane", ["$window", "paneManager", function ($window, paneManager) {
 
 			var generateSerialId = (function () {
 				var counter = 0;
@@ -297,7 +221,82 @@
 				},
 				template: '<div class=\"fa-pane {{$pane.id?\'pane-\'+$pane.id:\'pane-null-id\'}}\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" ng-click=\"$pane.toggle()\"></div> </div> </div>',
 				controllerAs: "$pane",
-				controller: function () {
+				controller: ["$rootScope", "Region", function ($rootScope, Region) {
+					var getOrientation = function (anchor) {
+						switch (anchor) {
+							case "north":
+							case "south":
+								return "vertical";
+							case "east":
+							case "west":
+								return "horizontal";
+						}
+					};
+
+					var getScrollerStyle = function (anchor, size) {
+						var style = {
+							top: 0,
+							right: 0,
+							bottom: 0,
+							left: 0
+						};
+
+						if (size) {
+							switch (anchor) {
+								case "north":
+									style.bottom = "auto";
+									style.height = "" + size + "px";
+									break;
+								case "east":
+									style.left = "auto";
+									style.width = "" + size + "px";
+									break;
+								case "south":
+									style.top = "auto";
+									style.height = "" + size + "px";
+									break;
+								case "west":
+									style.right = "auto";
+									style.width = "" + size + "px";
+							}
+						}
+
+						return style;
+					};
+
+					var getHandleStyle = function (anchor, region, handleSize) {
+						switch (anchor) {
+							case "north":
+								return {
+									height: region.calculateSize('vertical', handleSize) + "px",
+									right: 0,
+									left: 0,
+									bottom: 0
+								};
+							case "south":
+								return {
+									height: region.calculateSize('vertical', handleSize) + "px",
+									right: 0,
+									left: 0,
+									top: 0
+								};
+							case "east":
+								return {
+									width: region.calculateSize('horizontal', handleSize) + "px",
+									top: 0,
+									bottom: 0,
+									left: 0
+								};
+							case "west":
+								return {
+									width: region.calculateSize('horizontal', handleSize) + "px",
+									top: 0,
+									bottom: 0,
+									right: 0
+								};
+						}
+					};
+
 					angular.extend(this, {
 						children: [],
 						closed: false,
@@ -307,7 +306,7 @@
 						// Schedule a re-flow later in the digest cycle, but do not reflow
 						// more than necessary
 						$scheduleReflow: function () {
-							var $pane = this
+							var $pane = this;
 							if ($pane.parent) {
 								$pane.parent.$scheduleReflow();
 							} else if (!$pane.$reflowScheduled) {
@@ -551,7 +550,6 @@
 							// Fix for dragging on toggle
 							if (faDragged) {
 								faDragged = false;
-								return $pane;
 							}
 
 							if (open == null) {
@@ -577,63 +575,61 @@
 							reflow();
 						}
 					});
-				},
+				}],
 				compile: function ($el, $attrs, $transclude) {
 					// Tool used to force elements into their compile order
 					var serialId = generateSerialId();
 
-					return function postlink($scope, $el, $attrs, $paneCtrl) {
+					return function postlink($scope, $el, $attrs, paneCtrl) {
 						var $directiveScope = $scope.$parent.$new();
-						$directiveScope.$pane = $scope.$pane = $paneCtrl;
+						$directiveScope.$pane = $scope.$pane = paneCtrl;
 
 						var $transcludeScope = $directiveScope.$new();
 
-						if ($paneCtrl.order == null) {
-							$paneCtrl.order = serialId;
+						if (paneCtrl.order == null) {
+							paneCtrl.order = serialId;
 						}
 
-						$paneCtrl.id = $attrs.faPane;
+						paneCtrl.id = $attrs.faPane;
 
-						$paneCtrl.$isolateScope = $scope;
-						$paneCtrl.$directiveScope = $directiveScope;
-						$paneCtrl.$transcludeScope = $transcludeScope;
+						paneCtrl.$directiveScope = $directiveScope;
+						paneCtrl.$transcludeScope = $transcludeScope;
 
 						$transclude($transcludeScope, function (clone) {
 							clone.addClass("fa-pane-scroller");
-
 							$el.append(clone);
 
-							$paneCtrl.$containerEl = $el;
-							$paneCtrl.$overlayEl = $el.children().eq(0);
-							$paneCtrl.$handleEl = $el.children().eq(1);
-							$paneCtrl.$scrollerEl = $el.children().eq(2);
+							paneCtrl.$containerEl = $el;
+							paneCtrl.$overlayEl = $el.children().eq(0);
+							paneCtrl.$handleEl = $el.children().eq(1);
+							paneCtrl.$scrollerEl = $el.children().eq(2);
 
 							$scope.$watch("anchor", function (anchor) {
-								$paneCtrl.setAnchor(anchor);
+								paneCtrl.setAnchor(anchor);
 							});
 
 							$scope.$watch("size", function (targetSize) {
-								$paneCtrl.setTargetSize(targetSize);
+								paneCtrl.setTargetSize(targetSize);
 							});
 
 							$scope.$watch("closed", function (closed) {
-								$paneCtrl.toggle(!closed);
+								paneCtrl.toggle(!closed);
 							});
 
 							$scope.$watch("min", function (min) {
-								$paneCtrl.setMinSize(min != null ? min : 0);
+								paneCtrl.setMinSize(min != null ? min : 0);
 							});
 
 							$scope.$watch("max", function (max) {
-								$paneCtrl.setMaxSize(max != null ? max : Number.MAX_VALUE);
+								paneCtrl.setMaxSize(max != null ? max : Number.MAX_VALUE);
 							});
 
 							$scope.$watch("order", function (order) {
-								$paneCtrl.setOrder(order);
+								paneCtrl.setOrder(order);
 							});
 
 							$scope.$watch("noToggle", function (noToggle) {
-								$paneCtrl.setNoToggle(!!noToggle);
+								paneCtrl.setNoToggle(!!noToggle);
 							});
 
 							// is this watcher useless?
@@ -642,55 +638,56 @@
 									paneManager.remove(prevPaneId);
 								}
 
-								paneManager.set(paneId, $paneCtrl);
+								paneManager.set(paneId, paneCtrl);
 
-								$paneCtrl.id = paneId;
+								paneCtrl.id = paneId;
 							});
 
 							$scope.$watch("handle", function (handle) {
-								$paneCtrl.setHandleSize(handle);
+								paneCtrl.setHandleSize(handle);
 							});
 
 							// todo: something unused here
 							$scope.$watch($attrs.paneHandleObj, (function (handle) {
 								if (handle) {
-									$paneCtrl.setHandleSize(handle);
+									paneCtrl.setHandleSize(handle);
 								}
 							}), true);
 
-							$paneCtrl.$directiveScope.$on("fa-pane-attach", function (e, child) {
-								if (child !== $paneCtrl) {
+							paneCtrl.$directiveScope.$on("fa-pane-attach", function (e, child) {
+								if (child !== paneCtrl) {
 
 									e.stopPropagation();
-									$paneCtrl.addChild(child);
+									paneCtrl.addChild(child);
 								}
 							});
 
-							$paneCtrl.$directiveScope.$on("fa-pane-detach", function (e, child) {
-								if (child !== $paneCtrl) {
+							paneCtrl.$directiveScope.$on("fa-pane-detach", function (e, child) {
+								if (child !== paneCtrl) {
 									e.stopPropagation();
-									$paneCtrl.removeChild(child);
+									paneCtrl.removeChild(child);
 								}
+							});
+
+							paneCtrl.$directiveScope.$on("$stateChangeSuccess", function () {
+								paneCtrl.$scheduleReflow();
+							});
+
+							paneCtrl.$directiveScope.$on("$viewContentLoaded", function () {
+								paneCtrl.$scheduleReflow();
+							});
+
+							paneCtrl.$directiveScope.$emit("fa-pane-attach", paneCtrl);
+
+							paneCtrl.$directiveScope.$on("$destroy", function () {
+								paneCtrl.$directiveScope.$emit("fa-pane-detach", paneCtrl);
 							});
 
 							$window.addEventListener("resize", function (e) {
 								e.stopPropagation();
-								$paneCtrl.$scheduleReflow();
+								paneCtrl.$scheduleReflow();
 							});
 
-							$paneCtrl.$directiveScope.$on("$stateChangeSuccess", function () {
-								$paneCtrl.$scheduleReflow();
-							});
-
-							$paneCtrl.$directiveScope.$on("$viewContentLoaded", function () {
-								$paneCtrl.$scheduleReflow();
-							});
-
-							$paneCtrl.$directiveScope.$emit("fa-pane-attach", $paneCtrl);
-
-							$paneCtrl.$directiveScope.$on("$destroy", function () {
-								$paneCtrl.$directiveScope.$emit("fa-pane-detach", $paneCtrl);
-							});
 						});
 					};
 				}
@@ -698,15 +695,18 @@
 		}]
 	);
 
-	// not used
-	module.directive("faPaneToggle", ["paneManager", function (paneManager) {
+	module.directive("faPaneToggle", function () {
 			return {
+				restrict: 'A',
+				require: '^faPane',
 				link: function ($scope, $el, $attrs) {
-					$attrs.$observe("faPaneToggle", function (paneId) {
-					});
+					$el.on('click', function(event){
+						event.preventDefault()
+						$scope.$pane.toggle()
+					})
 				}
 			};
-		}]);
+		});
 
 	module.directive("faPaneResizer", ["$window", function ($window) {
 
@@ -797,7 +797,6 @@
 						// Null out the event in case of memory leaks
 						//e.setCapture();
 						e.preventDefault();
-						e.defaultPrevented = true;
 						e = null;
 					};
 
@@ -818,7 +817,6 @@
 							// Null out the event in case of memory leaks
 							//e.releaseCapture();
 							e.preventDefault();
-							e.defaultPrevented = true;
 							e = null;
 						};
 
@@ -828,7 +826,7 @@
 						}
 
 						cleanup();
-						faDragged = false; // Fix for dragging on toggle
+						//faDragged = false; // Fix for dragging on toggle
 					};
 
 					$window.addEventListener("mouseup", handleMouseUp, true);
