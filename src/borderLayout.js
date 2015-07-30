@@ -295,7 +295,7 @@
 					order: "@paneOrder",
 					noToggle: "@paneNoToggle"
 				},
-				templateUrl: 'template/borderLayout.tpl.html',
+				template: '/*the place to place the generated angular templateCache*/',
 				controllerAs: "$pane",
 				controller: function () {
 					angular.extend(this, {
@@ -837,8 +837,6 @@
 			}
 		};
 	});
-
-	/*the place to place the generated angular templateCache*/
 
 	return module
 }));

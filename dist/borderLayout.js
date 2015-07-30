@@ -295,7 +295,7 @@
 					order: "@paneOrder",
 					noToggle: "@paneNoToggle"
 				},
-				templateUrl: '../../src/borderLayout.tpl.html',
+				template: '<div class=\"fa-pane {{$pane.id?\'pane-\'+$pane.id:\'pane-null-id\'}}\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" ng-click=\"$pane.toggle()\"></div> </div> </div>',
 				controllerAs: "$pane",
 				controller: function () {
 					angular.extend(this, {
@@ -699,17 +699,14 @@
 	);
 
 	// not used
-	module.directive("faPaneToggle", [
-		"paneManager",
-		function (paneManager) {
+	module.directive("faPaneToggle", ["paneManager", function (paneManager) {
 			return {
 				link: function ($scope, $el, $attrs) {
 					$attrs.$observe("faPaneToggle", function (paneId) {
 					});
 				}
 			};
-		}
-	]);
+		}]);
 
 	module.directive("faPaneResizer", ["$window", function ($window) {
 
@@ -839,10 +836,7 @@
 				});
 			}
 		};
-	}
-	]);
-
-	angular.module("fa.directive.borderLayout").run(["$templateCache", function($templateCache) {$templateCache.put("template/borderLayout.tpl.html","<div class=\"fa-pane pane-{{$pane.id}}\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" ng-click=\"$pane.toggle()\"></div> </div> </div>");}]);
+	}]);
 
 	return module
 }));
