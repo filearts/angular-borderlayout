@@ -26,3 +26,4 @@ build/Release
 /bower_components
 .idea/
 .tmp/
+backup/
