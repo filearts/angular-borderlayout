@@ -334,7 +334,7 @@
 				noResize: "@paneNoResize",
 				noToggle: "@paneNoToggle"
 			},
-			template: '<div class=\"fa-pane {{$pane.id?\'pane-\'+$pane.id:\'pane-null-id\'}}\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" fa-pane-toggle></div> </div> </div>',
+			template: '<div class=\"fa-pane\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" fa-pane-toggle></div> </div> </div>',
 			controllerAs: "$pane",
 			controller: ["$rootScope", "Region", function faPaneController($rootScope, Region) {
 
@@ -350,8 +350,8 @@
 					// more than necessary
 					$scheduleReflow: function () {
 						var $pane = this;
-						if ($pane.parent) {
-							$pane.parent.$scheduleReflow();
+						if ($pane.paneParent) {
+							$pane.paneParent.$scheduleReflow();
 						} else if (!$pane.$reflowScheduled) {
 							$pane.$reflowScheduled = true;
 
@@ -366,14 +366,14 @@
 					},
 					$onStartResize: function () {
 						if (this.$parent) {
-							this.parent.$containerEl.addClass("fa-pane-resizing");
+							this.paneParent.$containerEl.addClass("fa-pane-resizing");
 						} else {
 							this.$containerEl.addClass("fa-pane-resizing");
 						}
 					},
 					$onStopResize: function () {
 						if (this.$parent) {
-							this.parent.$containerEl.removeClass("fa-pane-resizing");
+							this.paneParent.$containerEl.removeClass("fa-pane-resizing");
 						} else {
 							this.$containerEl.removeClass("fa-pane-resizing");
 						}
@@ -475,7 +475,7 @@
 						this.$scheduleReflow();
 					},
 					addChild: function (child) {
-						child.parent = this;
+						child.paneParent = this;
 						this.children.push(child);
 
 						if (this.children.length) {
@@ -561,7 +561,7 @@
 						}
 
 						$pane.$region = region.clone();
-						$pane.reflowChildren(region.getInnerRegion());
+						$pane.reflowChildren($pane.$region.getInnerRegion());
 
 						$rootScope.$broadcast("fa-pane-resize", $pane);
 					},
@@ -573,14 +573,11 @@
 							return a.order - b.order;
 						});
 
-						var results = [];
 
 						for (var i = 0; i < $pane.children.length; i++) {
 							var child = $pane.children[i];
-							results.push(child.reflow(region));
+							child.reflow(region);
 						}
-
-						return results;
 					},
 					resize: function (size) {
 						var $pane = this;
@@ -589,7 +586,7 @@
 						}
 
 						$pane.targetSize = size;
-						$pane.parent.reflowChildren($pane.parent.$region.getInnerRegion());
+						$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
 
 						if (size !== $pane.size) {
 							$pane.$containerEl.addClass("fa-pane-constrained");
@@ -629,7 +626,7 @@
 					paneCtrl.order = serialId;
 				}
 
-				paneCtrl.id = attr.faPane;
+				paneCtrl.id = attr['faPane'];
 
 				paneCtrl.$isolateScope = scope;
 				paneCtrl.$directiveScope = $directiveScope;
@@ -644,6 +641,9 @@
 					paneCtrl.$handleEl = el.children().eq(1);
 					paneCtrl.$scrollerEl = el.children().eq(2);
 
+					/*
+					 * scope watchers
+					 */
 					scope.$watch("anchor", function (anchor) {
 						paneCtrl.setAnchor(anchor);
 					});
@@ -680,16 +680,21 @@
 					scope.$watch("paneId", function (paneId, prevPaneId) {
 						if (prevPaneId) {
 							paneManager.remove(prevPaneId);
+							paneCtrl.$containerEl.removeClass('pane-' + prevPaneId)
 						}
 
 						paneManager.set(paneId, paneCtrl);
 						paneCtrl.id = paneId;
+						paneCtrl.$containerEl.addClass('pane-' + paneCtrl.id)
 					});
 
 					attr.$observe("paneHandle", function (handle) {
 						paneCtrl.setHandleSize(scope.$eval(handle));
 					});
 
+					/*
+					 * directive scope listeners
+					 */
 					paneCtrl.$directiveScope.$on("fa-pane-attach", function (e, child) {
 						if (child !== paneCtrl) {
 
@@ -713,13 +718,16 @@
 						paneCtrl.$scheduleReflow();
 					});
 
-					paneCtrl.$directiveScope.$emit("fa-pane-attach", paneCtrl);
-
 					paneCtrl.$directiveScope.$on("$destroy", function () {
 						paneCtrl.$directiveScope.$emit("fa-pane-detach", paneCtrl);
 						$window.removeEventListener("resize", handleWindowResize);
 					});
 
+					paneCtrl.$directiveScope.$emit("fa-pane-attach", paneCtrl);
+
+					/*
+					 * window listener
+					 */
 					$window.addEventListener("resize", handleWindowResize);
 
 					function handleWindowResize(e) {
@@ -855,22 +863,19 @@
 						$window.removeEventListener("mousemove", handleMouseMoveThrottled, true);
 						$window.removeEventListener("mouseup", handleMouseUp, true);
 
-						var cleanup = function () {
-							$pane.$onStopResize();
-
-							// Null out the event in case of memory leaks
-							//e.releaseCapture();
-							e.preventDefault();
-							e.defaultPrevented = true;
-							e = null;
-						};
-
 						if (!(displacementSq <= Math.pow(clickRadius, 2) && timeElapsed <= clickTime)) {
 							// In case the mouse is released at the end of a throttle period
 							handleMouseMove(e);
 						}
 
-						cleanup();
+						// clean up
+						$pane.$onStopResize();
+
+						// Null out the event in case of memory leaks
+						//e.releaseCapture();
+						e.preventDefault();
+						e.defaultPrevented = true;
+						e = null;
 					};
 
 					$window.addEventListener("mouseup", handleMouseUp, true);
