@@ -8,9 +8,14 @@
 </div>
 
 <div fa-pane="3.1" pane-anchor="south" pane-size="50% + 4px" pane-handle="4" pane-no-toggle="true">
-	This is a 'south' pane nested inside the center of the outer layout with lower priority than the west pane.
+	<div>This is a 'south' pane nested inside the center of the outer layout with lower priority than the west pane.
 
-	<pre ng-bind="$pane.getOptions() | json"></pre>
+		<pre ng-bind="$pane.getOptions() | json"></pre>
+		<pre>
+			{{name}}
+			{{panes}}
+		</pre>
+	</div>
 </div>
 <div fa-pane="3.2">
 	<pre ng-bind="$pane.getOptions() | json"></pre>

@@ -315,6 +315,8 @@
 			return !!str
 		};
 
+		var promise = null
+
 		// BEGIN DIRECTIVE DECLARATION
 		return {
 			restrict: "A",
@@ -336,7 +338,8 @@
 			},
 			template: '<div class=\"fa-pane\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" fa-pane-toggle></div> </div> </div>',
 			controllerAs: "$pane",
-			controller: ["$rootScope", "Region", function faPaneController($rootScope, Region) {
+			controller: ["$rootScope", "$scope", "$attrs", "$timeout", "Region", function faPaneController($rootScope, $scope, $attrs, $timeout, Region) {
+				var $pane = this;
 
 				angular.extend(this, {
 					children: [],
@@ -482,7 +485,7 @@
 							this.$containerEl.addClass("fa-pane-parent");
 						}
 
-						this.$scheduleReflow();
+						//this.$scheduleReflow();
 					},
 					getOrientation: function () {
 						return getOrientation(this.anchor);
@@ -532,8 +535,11 @@
 							if (!$pane.closed) {
 								size = region.calculateSize(orientation, !$pane.closed && $pane.targetSize || handleSize);
 
-								size = Math.min(size, region.calculateSize(orientation, $pane.max));
-								size = Math.max(size, region.calculateSize(orientation, $pane.min));
+								$pane.maxSize = $pane.max === Number.MAX_VALUE ?
+									region.getSize(getOrientation($pane.anchor)) : region.calculateSize(orientation, $pane.max);
+								$pane.minSize = region.calculateSize(orientation, $pane.min);
+								size = Math.min(size, $pane.maxSize);
+								size = Math.max(size, $pane.minSize);
 								size = Math.min(size, region.getAvailableSize(orientation));
 								size = Math.max(size, handleSize);
 							}
@@ -563,6 +569,15 @@
 						$pane.$region = region.clone();
 						$pane.reflowChildren($pane.$region.getInnerRegion());
 
+						if (promise !== null) {
+							$timeout.cancel(promise);
+						}
+
+						promise = $timeout(function () {
+							$rootScope.$broadcast("fa-pane-reflow-finished", $pane);
+							promise = null;
+						}, 400);
+
 						$rootScope.$broadcast("fa-pane-resize", $pane);
 					},
 					reflowChildren: function (region) {
@@ -586,12 +601,12 @@
 						}
 
 						$pane.targetSize = size;
-						$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
 
-						if (size !== $pane.size) {
+						if (size > $pane.maxSize || size < $pane.minSize) {
 							$pane.$containerEl.addClass("fa-pane-constrained");
 						} else {
 							$pane.$containerEl.removeClass("fa-pane-constrained");
+							$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
 						}
 					},
 					toggle: function (open) {
@@ -611,6 +626,65 @@
 
 						$pane.$scheduleReflow();
 					}
+				});
+
+				/*
+				 * scope watchers
+				 */
+				$scope.$watch("anchor", function (anchor) {
+					if (anchor === undefined)return;
+					$pane.setAnchor(anchor);
+				});
+
+				$scope.$watch("size", function (targetSize) {
+					//if (targetSize === undefined)return;
+					$pane.setTargetSize(targetSize);
+				});
+
+				$scope.$watch("closed", function (closed) {
+					if (closed === undefined)return;
+					$pane.toggle(!closed);
+				});
+
+				$scope.$watch("min", function (min) {
+					if (min === undefined)return;
+					$pane.setMinSize(min);
+				});
+
+				$scope.$watch("max", function (max) {
+					if (max === undefined)return;
+					$pane.setMaxSize(max);
+				});
+
+				/*scope.$watch("order", function (order) {
+				 paneCtrl.setOrder(order);
+				 });*/
+
+				$scope.$watch("noResize", function (noResize) {
+					if (noResize === undefined)return;
+					$pane.setNoResize(stringToBoolean(noResize));
+				});
+
+				$scope.$watch("noToggle", function (noToggle) {
+					if (noToggle === undefined)return;
+					$pane.setNoToggle(stringToBoolean(noToggle));
+				});
+
+				// is this watcher useless?
+				$scope.$watch("paneId", function (paneId, prevPaneId) {
+					if (prevPaneId) {
+						paneManager.remove(prevPaneId);
+						$pane.$containerEl.removeClass('pane-' + prevPaneId)
+					}
+
+					paneManager.set(paneId, $pane);
+					$pane.id = paneId;
+					$pane.$containerEl.addClass('pane-' + $pane.id)
+				});
+
+				$scope.$watch("handle", function (handle, prev) {
+					if (handle === undefined)return;
+					$pane.setHandleSize($scope.$eval(handle));
 				});
 			}],
 			link: function postlink(scope, el, attr, paneCtrl, transcludeFn) {
@@ -632,6 +706,50 @@
 				paneCtrl.$directiveScope = $directiveScope;
 				paneCtrl.$transcludeScope = $transcludeScope;
 
+				/*
+				 * directive scope listeners
+				 */
+				paneCtrl.$directiveScope.$on("fa-pane-attach", function (e, child) {
+					if (child !== paneCtrl) {
+
+						e.stopPropagation();
+						paneCtrl.addChild(child);
+					}
+				});
+
+				paneCtrl.$directiveScope.$on("fa-pane-detach", function (e, child) {
+					if (child !== paneCtrl) {
+						e.stopPropagation();
+						paneCtrl.removeChild(child);
+					}
+				});
+
+				paneCtrl.$directiveScope.$on("$stateChangeSuccess", function () {
+					paneCtrl.$scheduleReflow();
+				});
+
+				//	paneCtrl.$directiveScope.$on("$viewContentLoaded", function () {
+				//		paneCtrl.$scheduleReflow();
+				//	});
+
+				paneCtrl.$directiveScope.$on("$destroy", function () {
+					paneCtrl.$directiveScope.$emit("fa-pane-detach", paneCtrl);
+					$window.removeEventListener("resize", handleWindowResize);
+				});
+
+				/*
+				 * window listener
+				 */
+				$window.addEventListener("resize", handleWindowResize);
+
+				function handleWindowResize(e) {
+					e.stopPropagation();
+					paneCtrl.$scheduleReflow();
+				}
+
+				/*
+				 * transclude function
+				 */
 				transcludeFn($transcludeScope, function (clone) {
 					clone.addClass("fa-pane-scroller");
 					el.append(clone);
@@ -641,99 +759,7 @@
 					paneCtrl.$handleEl = el.children().eq(1);
 					paneCtrl.$scrollerEl = el.children().eq(2);
 
-					/*
-					 * scope watchers
-					 */
-					scope.$watch("anchor", function (anchor) {
-						paneCtrl.setAnchor(anchor);
-					});
-
-					scope.$watch("size", function (targetSize) {
-						paneCtrl.setTargetSize(targetSize);
-					});
-
-					scope.$watch("closed", function (closed) {
-						paneCtrl.toggle(!closed);
-					});
-
-					scope.$watch("min", function (min) {
-						paneCtrl.setMinSize(min);
-					});
-
-					scope.$watch("max", function (max) {
-						paneCtrl.setMaxSize(max);
-					});
-
-					/*scope.$watch("order", function (order) {
-					 paneCtrl.setOrder(order);
-					 });*/
-
-					scope.$watch("noResize", function (noResize) {
-						paneCtrl.setNoResize(stringToBoolean(noResize));
-					});
-
-					scope.$watch("noToggle", function (noToggle) {
-						paneCtrl.setNoToggle(stringToBoolean(noToggle));
-					});
-
-					// is this watcher useless?
-					scope.$watch("paneId", function (paneId, prevPaneId) {
-						if (prevPaneId) {
-							paneManager.remove(prevPaneId);
-							paneCtrl.$containerEl.removeClass('pane-' + prevPaneId)
-						}
-
-						paneManager.set(paneId, paneCtrl);
-						paneCtrl.id = paneId;
-						paneCtrl.$containerEl.addClass('pane-' + paneCtrl.id)
-					});
-
-					attr.$observe("paneHandle", function (handle) {
-						paneCtrl.setHandleSize(scope.$eval(handle));
-					});
-
-					/*
-					 * directive scope listeners
-					 */
-					paneCtrl.$directiveScope.$on("fa-pane-attach", function (e, child) {
-						if (child !== paneCtrl) {
-
-							e.stopPropagation();
-							paneCtrl.addChild(child);
-						}
-					});
-
-					paneCtrl.$directiveScope.$on("fa-pane-detach", function (e, child) {
-						if (child !== paneCtrl) {
-							e.stopPropagation();
-							paneCtrl.removeChild(child);
-						}
-					});
-
-					paneCtrl.$directiveScope.$on("$stateChangeSuccess", function () {
-						paneCtrl.$scheduleReflow();
-					});
-
-					paneCtrl.$directiveScope.$on("$viewContentLoaded", function () {
-						paneCtrl.$scheduleReflow();
-					});
-
-					paneCtrl.$directiveScope.$on("$destroy", function () {
-						paneCtrl.$directiveScope.$emit("fa-pane-detach", paneCtrl);
-						$window.removeEventListener("resize", handleWindowResize);
-					});
-
 					paneCtrl.$directiveScope.$emit("fa-pane-attach", paneCtrl);
-
-					/*
-					 * window listener
-					 */
-					$window.addEventListener("resize", handleWindowResize);
-
-					function handleWindowResize(e) {
-						e.stopPropagation();
-						paneCtrl.$scheduleReflow();
-					}
 				});
 			}
 		};
@@ -854,7 +880,7 @@
 					};
 
 					// Prevent the reflow logic from happening too often
-					var handleMouseMoveThrottled = _.throttle(handleMouseMove, 16);
+					var handleMouseMoveThrottled = _.throttle(handleMouseMove, 32);
 
 					var handleMouseUp = function (e) {
 						var displacementSq = Math.pow(e.screenX - startPos.x, 2) + Math.pow(e.screenY - startPos.y, 2);
