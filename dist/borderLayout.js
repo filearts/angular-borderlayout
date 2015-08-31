@@ -204,7 +204,7 @@
 
 	});
 
-	module.directive("faPane", ["$window", "paneManager", function ($window, paneManager) {
+	module.directive("faPane", ["$window", "$templateCache", "paneManager", function ($window, $templateCache, paneManager) {
 
 		var getOrientation = function (anchor) {
 			switch (anchor) {
@@ -307,7 +307,6 @@
 			return fun;
 		})();
 
-
 		var stringToBoolean = function stringToBoolean(str) {
 			if (angular.isString(str)) {
 				str = angular.lowercase(str) === 'true';
@@ -315,7 +314,7 @@
 			return !!str
 		};
 
-		var promise = null
+		var promise = null;
 
 		// BEGIN DIRECTIVE DECLARATION
 		return {
@@ -336,11 +335,9 @@
 				noResize: "@paneNoResize",
 				noToggle: "@paneNoToggle"
 			},
-			template: '<div class=\"fa-pane\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" fa-pane-toggle></div> </div> </div>',
+			template: $templateCache.get('template/borderLayout.tpl.html'),
 			controllerAs: "$pane",
 			controller: ["$rootScope", "$scope", "$attrs", "$timeout", "Region", function faPaneController($rootScope, $scope, $attrs, $timeout, Region) {
-				var $pane = this;
-
 				angular.extend(this, {
 					children: [],
 					closed: false,
@@ -600,6 +597,8 @@
 							size = $pane.targetSize;
 						}
 
+						if(size === $pane.size) return;
+
 						$pane.targetSize = size;
 
 						if (size > $pane.maxSize || size < $pane.minSize) {
@@ -627,74 +626,13 @@
 						$pane.$scheduleReflow();
 					}
 				});
-
-				/*
-				 * scope watchers
-				 */
-				$scope.$watch("anchor", function (anchor) {
-					if (anchor === undefined)return;
-					$pane.setAnchor(anchor);
-				});
-
-				$scope.$watch("size", function (targetSize) {
-					//if (targetSize === undefined)return;
-					$pane.setTargetSize(targetSize);
-				});
-
-				$scope.$watch("closed", function (closed) {
-					if (closed === undefined)return;
-					$pane.toggle(!closed);
-				});
-
-				$scope.$watch("min", function (min) {
-					if (min === undefined)return;
-					$pane.setMinSize(min);
-				});
-
-				$scope.$watch("max", function (max) {
-					if (max === undefined)return;
-					$pane.setMaxSize(max);
-				});
-
-				/*scope.$watch("order", function (order) {
-				 paneCtrl.setOrder(order);
-				 });*/
-
-				$scope.$watch("noResize", function (noResize) {
-					if (noResize === undefined)return;
-					$pane.setNoResize(stringToBoolean(noResize));
-				});
-
-				$scope.$watch("noToggle", function (noToggle) {
-					if (noToggle === undefined)return;
-					$pane.setNoToggle(stringToBoolean(noToggle));
-				});
-
-				// is this watcher useless?
-				$scope.$watch("paneId", function (paneId, prevPaneId) {
-					if (prevPaneId) {
-						paneManager.remove(prevPaneId);
-						$pane.$containerEl.removeClass('pane-' + prevPaneId)
-					}
-
-					paneManager.set(paneId, $pane);
-					$pane.id = paneId;
-					$pane.$containerEl.addClass('pane-' + $pane.id)
-				});
-
-				$scope.$watch("handle", function (handle, prev) {
-					if (handle === undefined)return;
-					$pane.setHandleSize($scope.$eval(handle));
-				});
 			}],
 			link: function postlink(scope, el, attr, paneCtrl, transcludeFn) {
 				// Tool used to force elements into their compile order
 				var serialId = generateSerialId();
 
-				var $directiveScope = scope.$parent.$new();
-				$directiveScope.$pane = scope.$pane = paneCtrl;
-
-				var $transcludeScope = $directiveScope.$new();
+				var $transcludeScope = scope.$parent.$new();
+				$transcludeScope.$pane = scope.$pane = paneCtrl;
 
 				if (paneCtrl.order == null) {
 					paneCtrl.order = serialId;
@@ -702,14 +640,72 @@
 
 				paneCtrl.id = attr['faPane'];
 
+				/*
+				 * scope watchers
+				 */
+				scope.$watch("anchor", function (anchor) {
+					if (anchor === undefined)return;
+					paneCtrl.setAnchor(anchor);
+				});
+
+				scope.$watch("size", function (targetSize) {
+					//if (targetSize === undefined)return;
+					paneCtrl.setTargetSize(targetSize);
+				});
+
+				scope.$watch("closed", function (closed) {
+					if (closed === undefined)return;
+					paneCtrl.toggle(!closed);
+				});
+
+				scope.$watch("min", function (min) {
+					if (min === undefined)return;
+					paneCtrl.setMinSize(min);
+				});
+
+				scope.$watch("max", function (max) {
+					if (max === undefined)return;
+					paneCtrl.setMaxSize(max);
+				});
+
+				/*scope.$watch("order", function (order) {
+				 paneCtrl.setOrder(order);
+				 });*/
+
+				scope.$watch("noResize", function (noResize) {
+					if (noResize === undefined)return;
+					paneCtrl.setNoResize(stringToBoolean(noResize));
+				});
+
+				scope.$watch("noToggle", function (noToggle) {
+					if (noToggle === undefined)return;
+					paneCtrl.setNoToggle(stringToBoolean(noToggle));
+				});
+
+				// is this watcher useless?
+				scope.$watch("paneId", function (paneId, prevPaneId) {
+					if (prevPaneId) {
+						paneManager.remove(prevPaneId);
+						paneCtrl.$containerEl.removeClass('pane-' + prevPaneId)
+					}
+
+					paneManager.set(paneId, paneCtrl);
+					paneCtrl.id = paneId;
+					paneCtrl.$containerEl.addClass('pane-' + paneCtrl.id)
+				});
+
+				scope.$watch("handle", function (handle, prev) {
+					if (handle === undefined)return;
+					paneCtrl.setHandleSize(scope.$eval(handle));
+				});
+
 				paneCtrl.$isolateScope = scope;
-				paneCtrl.$directiveScope = $directiveScope;
 				paneCtrl.$transcludeScope = $transcludeScope;
 
 				/*
 				 * directive scope listeners
 				 */
-				paneCtrl.$directiveScope.$on("fa-pane-attach", function (e, child) {
+				$transcludeScope.$on("fa-pane-attach", function (e, child) {
 					if (child !== paneCtrl) {
 
 						e.stopPropagation();
@@ -717,23 +713,23 @@
 					}
 				});
 
-				paneCtrl.$directiveScope.$on("fa-pane-detach", function (e, child) {
+				$transcludeScope.$on("fa-pane-detach", function (e, child) {
 					if (child !== paneCtrl) {
 						e.stopPropagation();
 						paneCtrl.removeChild(child);
 					}
 				});
 
-				paneCtrl.$directiveScope.$on("$stateChangeSuccess", function () {
+				$transcludeScope.$on("$stateChangeSuccess", function () {
 					paneCtrl.$scheduleReflow();
 				});
 
-				//	paneCtrl.$directiveScope.$on("$viewContentLoaded", function () {
+				//	paneCtrl.$transcludeScope.$on("$viewContentLoaded", function () {
 				//		paneCtrl.$scheduleReflow();
 				//	});
 
-				paneCtrl.$directiveScope.$on("$destroy", function () {
-					paneCtrl.$directiveScope.$emit("fa-pane-detach", paneCtrl);
+				$transcludeScope.$on("$destroy", function () {
+					paneCtrl.$transcludeScope.$emit("fa-pane-detach", paneCtrl);
 					$window.removeEventListener("resize", handleWindowResize);
 				});
 
@@ -750,7 +746,7 @@
 				/*
 				 * transclude function
 				 */
-				transcludeFn($transcludeScope, function (clone) {
+				transcludeFn($transcludeScope, function (clone, scope) {
 					clone.addClass("fa-pane-scroller");
 					el.append(clone);
 
@@ -759,7 +755,7 @@
 					paneCtrl.$handleEl = el.children().eq(1);
 					paneCtrl.$scrollerEl = el.children().eq(2);
 
-					paneCtrl.$directiveScope.$emit("fa-pane-attach", paneCtrl);
+					scope.$emit("fa-pane-attach", paneCtrl);
 				});
 			}
 		};
@@ -824,9 +820,9 @@
 					var anchor = $pane.anchor;
 					var coord;
 					if (anchor === "north" || anchor === "south") {
-						coord = "screenY";
+						coord = "clientY";
 					} else if (anchor === "west" || anchor === "east") {
-						coord = "screenX";
+						coord = "clientX";
 					}
 
 					var scale;
@@ -869,7 +865,7 @@
 						$scope.$apply(function () {
 							var targetSize = startSize + scale * (e[coord] - startCoord);
 
-							return $pane.resize(targetSize);
+							$pane.resize(targetSize);
 						});
 
 						// Null out the event in case of memory leaks
@@ -880,7 +876,7 @@
 					};
 
 					// Prevent the reflow logic from happening too often
-					var handleMouseMoveThrottled = _.throttle(handleMouseMove, 32);
+					var handleMouseMoveThrottled = _.throttle(handleMouseMove, 33);
 
 					var handleMouseUp = function (e) {
 						var displacementSq = Math.pow(e.screenX - startPos.x, 2) + Math.pow(e.screenY - startPos.y, 2);
@@ -910,6 +906,8 @@
 			}
 		};
 	}]);
+
+	angular.module("fa.directive.borderLayout").run(["$templateCache", function($templateCache) {$templateCache.put("template/borderLayout.tpl.html","<div class=\"fa-pane\"> <div class=\"fa-pane-overlay\"></div> <div class=\"fa-pane-handle\" fa-pane-resizer> <div ng-if=\"!$pane.noToggle\" class=\"fa-pane-toggle\" fa-pane-toggle></div> </div> </div>");}]);
 
 	return module
 }));
