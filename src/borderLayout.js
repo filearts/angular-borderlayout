@@ -8,13 +8,13 @@
 		// only CommonJS-like environments that support module.exports,
 		// like Node.
 		// to support bundler like browserify
-		module.exports = factory(require('angular'), require('underscore'));
+		module.exports = factory(require('angular'));
 	} else {
 		// Browser globals (root is window)
-		factory(root.angular, root._);
+		factory(root.angular);
 	}
 
-}(this, function (angular, _) {
+}(this, function (angular) {
 
 	var module = angular.module("fa.directive.borderLayout", []);
 
@@ -775,6 +775,52 @@
 
 	module.directive("faPaneResizer", function ($window) {
 
+		/**
+		 * throttle
+		 *
+		 * Taken from underscore project
+		 *
+		 * @param {Function} func
+		 * @param {number} wait
+		 * @param {ThrottleOptions} options
+		 * @returns {Function}
+		 */
+		function throttle(func, wait, options) {
+			'use strict';
+			var getTime = (Date.now || function () {
+				return new Date().getTime();
+			});
+			var context, args, result;
+			var timeout = null;
+			var previous = 0;
+			options = options || {};
+			var later = function () {
+				previous = options.leading === false ? 0 : getTime();
+				timeout = null;
+				result = func.apply(context, args);
+				context = args = null;
+			};
+			return function () {
+				var now = getTime();
+				if (!previous && options.leading === false) {
+					previous = now;
+				}
+				var remaining = wait - (now - previous);
+				context = this;
+				args = arguments;
+				if (remaining <= 0) {
+					clearTimeout(timeout);
+					timeout = null;
+					previous = now;
+					result = func.apply(context, args);
+					context = args = null;
+				} else if (!timeout && options.trailing !== false) {
+					timeout = setTimeout(later, remaining);
+				}
+				return result;
+			};
+		}
+
 		return {
 			restrict: "A",
 			//require: "?^faPane",
@@ -876,7 +922,7 @@
 					};
 
 					// Prevent the reflow logic from happening too often
-					var handleMouseMoveThrottled = _.throttle(handleMouseMove, 33);
+					var handleMouseMoveThrottled = throttle(handleMouseMove, 33);
 
 					var handleMouseUp = function (e) {
 						var displacementSq = Math.pow(e.screenX - startPos.x, 2) + Math.pow(e.screenY - startPos.y, 2);
