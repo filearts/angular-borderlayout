@@ -1,6 +1,6 @@
 {
-  "name": "angular-borderlayout",
-  "version": "0.5.0",
+  "name": "angular-borderlayout2",
+  "version": "0.5.1",
   "authors": [
     "Geoff Goodman", "e-cloud"
   ],
@@ -20,7 +20,7 @@
     "angular"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/filearts/angular-borderlayout",
+  "homepage": "https://github.com/e-cloud/angular-borderlayout",
   "ignore": [
     "**/.*",
     "node_modules",
