@@ -524,6 +524,7 @@
 							var orientation = getOrientation($pane.anchor);
 
 							$pane.$containerEl.addClass("fa-pane-orientation-" + orientation);
+							$pane.anchor && $pane.$containerEl.addClass("fa-pane-direction-" + $pane.anchor);
 
 							var handleSize = region.calculateSize(orientation, !$pane.closed &&
 								$pane.handleSizeOpen || $pane.handleSizeClosed);
@@ -591,22 +592,31 @@
 							child.reflow(region);
 						}
 					},
-					resize: function (size) {
+					resize: function (targetSize) {
 						var $pane = this;
-						if (size == null) {
-							size = $pane.targetSize;
+						if (targetSize == null) {
+							targetSize = $pane.targetSize;
 						}
 
-						if (size === $pane.size) return;
+						if (targetSize === $pane.size) return;
 
-						$pane.targetSize = size;
+						$pane.targetSize = targetSize;
 
-						if (size > $pane.maxSize || size < $pane.minSize) {
+						if (targetSize > $pane.maxSize) {
 							$pane.$containerEl.addClass("fa-pane-constrained");
+							if ($pane.maxSize === $pane.size) {
+								return;
+							}
+						} else if (targetSize < $pane.minSize) {
+							$pane.$containerEl.addClass("fa-pane-constrained");
+							if ($pane.minSize === $pane.size) {
+								return;
+							}
 						} else {
 							$pane.$containerEl.removeClass("fa-pane-constrained");
-							$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
 						}
+
+						$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
 					},
 					toggle: function (open) {
 						var $pane = this;
