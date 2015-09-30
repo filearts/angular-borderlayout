@@ -8,12 +8,28 @@ var sass = require('gulp-sass')
 var cssmin = require('gulp-cssmin')
 var autoprefixer = require('gulp-autoprefixer')
 var templateCache = require('gulp-angular-templateCache')
+var header = require('gulp-header')
 var fs = require('fs')
 var runsequence = require('run-sequence')
 var del = require('del')
 
 gulp.task('build', function (cb) {
-	runsequence('backup', 'clean', 'build-html', 'build-js', 'build-sass', cb)
+	runsequence('backup', 'clean', 'build-html', 'build-js', 'build-sass', 'banner', cb)
+})
+
+gulp.task('banner', function () {
+	var pkg = require('./package.json');
+	var banner = ['/**',
+		' * <%= pkg.name %> - <%= pkg.description %>',
+		' * @version v<%= pkg.version %>',
+		' * @link <%= pkg.homepage %>',
+		' * @license <%= pkg.license %>',
+		' */',
+		''].join('\n')
+
+	return gulp.src('dist/**.{js,css}')
+		.pipe(header(banner, {pkg: pkg}))
+		.pipe(gulp.dest('dist'))
 })
 
 gulp.task('build-js', ['templateCache'], function () {

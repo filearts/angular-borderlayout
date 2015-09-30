@@ -1,3 +1,9 @@
+/**
+ * angular-borderlayout2 - A set of Angular.js components to manage and define border layouts
+ * @version v0.5.3
+ * @link https://github.com/e-cloud/angular-borderlayout
+ * @license MIT
+ */
 (function (root, factory) {
 
 	if (typeof define === 'function' && define.amd) {

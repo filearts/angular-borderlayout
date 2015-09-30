@@ -83,14 +83,18 @@
 
 .fa-pane-handle {
 	background: #ccc;
+	& > .fa-pane-toggle {
+		background-color: #666;
+		opacity: 0;
+	}
 }
 
 .fa-pane:hover > .fa-pane-handle > .fa-pane-toggle {
-	background: #666;
+	opacity: 1;
 }
 
 .fa-pane-resizing > .fa-pane-handle, .fa-pane-handle:hover {
-	background-color: #C4E1A4;
+	background-color: #c4e1a4;
 }
 
 .fa-pane-parent > .fa-pane-scroller {
