@@ -932,7 +932,7 @@
 					};
 
 					// Prevent the reflow logic from happening too often
-					var handleMouseMoveThrottled = throttle(handleMouseMove, 33);
+					var handleMouseMoveThrottled = throttle(handleMouseMove, 33, {trailing: false});
 
 					var handleMouseUp = function (e) {
 						var displacementSq = Math.pow(e.screenX - startPos.x, 2) + Math.pow(e.screenY - startPos.y, 2);

@@ -1,6 +1,6 @@
 /**
  * angular-borderlayout2 - A set of Angular.js components to manage and define border layouts
- * @version v0.5.3
+ * @version v0.5.4
  * @link https://github.com/e-cloud/angular-borderlayout
  * @license MIT
  */
@@ -938,7 +938,7 @@
 					};
 
 					// Prevent the reflow logic from happening too often
-					var handleMouseMoveThrottled = throttle(handleMouseMove, 33);
+					var handleMouseMoveThrottled = throttle(handleMouseMove, 33, {trailing: false});
 
 					var handleMouseUp = function (e) {
 						var displacementSq = Math.pow(e.screenX - startPos.x, 2) + Math.pow(e.screenY - startPos.y, 2);
