@@ -1,6 +1,6 @@
 /**
  * angular-borderlayout2 - A set of Angular.js components to manage and define border layouts
- * @version v0.5.4
+ * @version v0.5.5
  * @link https://github.com/e-cloud/angular-borderlayout
  * @license MIT
  */
@@ -854,12 +854,12 @@
 				}), function (newOrientation) {
 					switch (newOrientation) {
 						case "vertical":
-							$element.removeClass("horizontal");
-							$element.addClass("vertical");
+							$element.removeClass("vertical");
+							$element.addClass("horizontal");
 							break;
 						case "horizontal":
-							$element.addClass("horizontal");
-							$element.removeClass("vertical");
+							$element.addClass("vertical");
+							$element.removeClass("horizontal");
 							break;
 					}
 				});

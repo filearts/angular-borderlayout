@@ -848,12 +848,12 @@
 				}), function (newOrientation) {
 					switch (newOrientation) {
 						case "vertical":
-							$element.removeClass("horizontal");
-							$element.addClass("vertical");
+							$element.removeClass("vertical");
+							$element.addClass("horizontal");
 							break;
 						case "horizontal":
-							$element.addClass("horizontal");
-							$element.removeClass("vertical");
+							$element.addClass("vertical");
+							$element.removeClass("horizontal");
 							break;
 					}
 				});
