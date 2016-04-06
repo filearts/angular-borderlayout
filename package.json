@@ -1,6 +1,6 @@
 {
   "name": "angular-borderlayout2",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "A set of Angular.js components to manage and define border layouts",
   "main": "dist/borderLayout.js",
   "scripts": {
@@ -37,5 +37,13 @@
     "gulp-sass": "^2.0.4",
     "gulp-uglify": "^1.2.0",
     "run-sequence": "^1.1.2"
-  }
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "sample"
+  ]
 }
