@@ -7,14 +7,15 @@ var uglify = require('gulp-uglify')
 var sass = require('gulp-sass')
 var cssmin = require('gulp-cssmin')
 var autoprefixer = require('gulp-autoprefixer')
-var templateCache = require('gulp-angular-templateCache')
+var templateCache = require('gulp-angular-templatecache')
+const babel = require('gulp-babel')
 var header = require('gulp-header')
 var fs = require('fs')
-var runsequence = require('run-sequence')
+var runSequence = require('run-sequence')
 var del = require('del')
 
 gulp.task('build', function (cb) {
-	runsequence('backup', 'clean', 'build-html', 'build-js', 'build-sass', 'banner', cb)
+	runSequence('backup', 'clean', 'build-html', 'build-js', 'build-sass', 'banner', cb)
 })
 
 gulp.task('banner', function () {
@@ -37,6 +38,9 @@ gulp.task('build-js', ['templateCache'], function () {
 		.pipe(replace("/*the place to place the generated angular templateCache*/", function () {
 			return fs.readFileSync('.tmp/template.js', 'utf-8').toString()
 		}))
+		.pipe(babel({
+			presets: ['es2015']
+		}))
 		.pipe(ngAnnotate())
 		.pipe(gulp.dest('dist'))
 		.pipe(uglify())
@@ -55,7 +59,6 @@ gulp.task('build-html', function () {
 
 gulp.task('build-sass', function () {
 	return gulp.src('src/**.scss')
-		.pipe(gulp.dest('dist'))
 		.pipe(sass({
 			errLogToConsole: true,
 			outputStyle: 'expanded'

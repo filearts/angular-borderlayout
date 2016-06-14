@@ -1,15 +1,13 @@
 {
   "name": "angular-borderlayout2",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "authors": [
     "Geoff Goodman", "e-cloud"
   ],
   "description": "A set of Angular.js components to manage and define border layouts",
   "main": [
     "dist/borderLayout.js",
-    "dist/borderLayout.css",
-    "dist/borderLayout.min.js",
-    "dist/borderLayout.min.css"
+    "dist/borderLayout.css"
   ],
   "moduleType": [
     "amd",
@@ -30,10 +28,10 @@
     "sample"
   ],
   "dependencies": {
-    "angular": "^1.3"
+    "angular": "~1.5.0"
   },
   "devDependencies": {
-    "angular-route": "^1.3",
+    "angular-route": "^1.5",
     "bootstrap": "^3.2.0"
   }
 }
