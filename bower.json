@@ -2,7 +2,8 @@
   "name": "angular-borderlayout2",
   "version": "0.6.0",
   "authors": [
-    "Geoff Goodman", "e-cloud"
+    "Geoff Goodman",
+    "e-cloud"
   ],
   "description": "A set of Angular.js components to manage and define border layouts",
   "main": [
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "angular-route": "^1.5",
-    "bootstrap": "^3.2.0"
+    "bootstrap": "^3.2.0",
+    "angular-mocks": "^1.5.6"
   }
 }
