@@ -2,25 +2,25 @@
 	overflow: visible;
 }
 
-.fa-pane, .fa-pane-overlay, .fa-pane-handle, .fa-pane-scroller {
+.fa-pane, .fa-pane-overlay, .fa-pane-handle, .fa-pane-scroll-view {
 	display: block;
 	position: absolute;
 	box-sizing: border-box;
 }
 
-.fa-pane, .fa-pane-overlay, .fa-pane-scroller {
+.fa-pane, .fa-pane-overlay, .fa-pane-scroll-view {
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
 }
 
-.fa-pane-scroller {
+.fa-pane-scroll-view {
 	overflow: auto;
 	border: 1px solid #999;
 }
 
-.fa-pane-closed > .fa-pane-scroller {
+.fa-pane-closed > .fa-pane-scroll-view {
 	display: none;
 }
 
@@ -97,7 +97,7 @@
 	background-color: #c4e1a4;
 }
 
-.fa-pane-parent > .fa-pane-scroller {
+.fa-pane-parent > .fa-pane-scroll-view {
 	border: none;
 }
 

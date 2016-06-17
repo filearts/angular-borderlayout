@@ -247,7 +247,7 @@
 			}
 		}
 
-		function getScrollerStyle(anchor, size) {
+		function getScrollViewStyle(anchor, size) {
 			let style = {
 				top: 0,
 				right: 0,
@@ -346,7 +346,7 @@
 
 		return {
 			getOrientation,
-			getScrollerStyle,
+			getScrollViewStyle,
 			getHandleStyle,
 			generateSerialId,
 			stringToBoolean
@@ -586,13 +586,13 @@
 							this.size = size;
 
 							const styleContainer = region.consume($pane.anchor, size);
-							const styleScroller = faPaneUtil.getScrollerStyle($pane.anchor, size - handleSize);
+							const styleScrollView = faPaneUtil.getScrollViewStyle($pane.anchor, size - handleSize);
 							const styleHandle = faPaneUtil.getHandleStyle($pane.anchor, region, handleSize);
 
 							$pane.$containerEl.attr("style", "").css(styleContainer);
-							$pane.$overlayEl.attr("style", "").css(styleScroller);
+							$pane.$overlayEl.attr("style", "").css(styleScrollView);
 							$pane.$handleEl.attr("style", "").css(styleHandle);
-							$pane.$scrollerEl.attr("style", "").css(styleScroller);
+							$pane.$scrollViewEl.attr("style", "").css(styleScrollView);
 
 						} else {
 							$pane.$containerEl.css({
@@ -798,13 +798,13 @@
 				 * transclude function
 				 */
 				transcludeFn($transcludeScope, function (clone, scope) {
-					clone.addClass("fa-pane-scroller");
+					clone.addClass("fa-pane-scroll-view");
 					el.append(clone);
 
 					paneCtrl.$containerEl = el;
 					paneCtrl.$overlayEl = el.children().eq(0);
 					paneCtrl.$handleEl = el.children().eq(1);
-					paneCtrl.$scrollerEl = el.children().eq(2);
+					paneCtrl.$scrollViewEl = el.children().eq(2);
 
 					scope.$emit("fa-pane-attach", paneCtrl);
 				});
