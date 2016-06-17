@@ -725,12 +725,12 @@
 
 				scope.$watch("noResize", function (noResize) {
 					if (noResize === undefined)return;
-					paneCtrl.setNoResize(stringToBoolean(noResize));
+					paneCtrl.setNoResize(faPaneUtil.stringToBoolean(noResize));
 				});
 
 				scope.$watch("noToggle", function (noToggle) {
 					if (noToggle === undefined)return;
-					paneCtrl.setNoToggle(stringToBoolean(noToggle));
+					paneCtrl.setNoToggle(faPaneUtil.stringToBoolean(noToggle));
 				});
 
 				// is this watcher useless?
