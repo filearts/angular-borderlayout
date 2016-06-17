@@ -1,3 +1,4 @@
+/* global define */
 (function (root, factory) {
 
 	if (typeof define === 'function' && define.amd) {
@@ -951,7 +952,13 @@
 					event.preventDefault();
 					event = null;
 
-					const handleMouseMove = function (event) {
+					// Prevent the reflow logic from happening too often
+					const handleMouseMoveThrottled = throttle(handleMouseMove, 33, { trailing: false });
+
+					$window.addEventListener("mouseup", handleMouseUp, true);
+					$window.addEventListener("mousemove", handleMouseMoveThrottled, true);
+
+					function handleMouseMove(event) {
 
 						$pane.$onStartResize();
 
@@ -965,12 +972,9 @@
 						});
 
 						event.preventDefault();
-					};
+					}
 
-					// Prevent the reflow logic from happening too often
-					const handleMouseMoveThrottled = throttle(handleMouseMove, 33, { trailing: false });
-
-					const handleMouseUp = function (event) {
+					function handleMouseUp(event) {
 						const displacementSq = Math.pow(event.screenX - startPos.x, 2) + Math.pow(event.screenY - startPos.y, 2);
 						const timeElapsed = Date.now() - startTime;
 
@@ -986,10 +990,7 @@
 						$pane.$onStopResize();
 
 						event.preventDefault();
-					};
-
-					$window.addEventListener("mouseup", handleMouseUp, true);
-					$window.addEventListener("mousemove", handleMouseMoveThrottled, true);
+					}
 				});
 			}
 		};
