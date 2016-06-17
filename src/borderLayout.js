@@ -15,6 +15,8 @@
 
 }(window, function (angular) {
 
+	'use strict'
+
 	const ngModule = angular.module("fa.directive.borderLayout", [])
 
 	ngModule.factory("paneManager", function () {
@@ -539,7 +541,7 @@
 					removeChild: function (child) {
 						const index = this.children.indexOf(child);
 
-						if (!(0 > index)) {
+						if (index > -1) {
 							this.children.splice(index, 1);
 						}
 
@@ -556,8 +558,8 @@
 
 						region || (region = new Region(width, height));
 
-						const _ref = $pane.anchor;
-						if (_ref === "north" || _ref === "east" || _ref === "south" || _ref === "west") {
+						const anchor = $pane.anchor;
+						if (anchor === "north" || anchor === "east" || anchor === "south" || anchor === "west") {
 
 							$pane.$containerEl.removeClass("fa-pane-orientation-vertical");
 							$pane.$containerEl.removeClass("fa-pane-orientation-horizontal");
@@ -577,13 +579,14 @@
 								$pane.maxSize = $pane.max === Number.MAX_VALUE ?
 									region.getSize(faPaneUtil.getOrientation($pane.anchor)) : region.calculateSize(orientation, $pane.max);
 								$pane.minSize = region.calculateSize(orientation, $pane.min);
+
 								size = Math.min(size, $pane.maxSize);
 								size = Math.max(size, $pane.minSize);
 								size = Math.min(size, region.getAvailableSize(orientation));
 								size = Math.max(size, handleSize);
 							}
 
-							this.size = size;
+							$pane.size = size;
 
 							const styleContainer = region.consume($pane.anchor, size);
 							const styleScrollView = faPaneUtil.getScrollViewStyle($pane.anchor, size - handleSize);
@@ -695,7 +698,7 @@
 				 * scope watchers
 				 */
 				scope.$watch("anchor", function (anchor) {
-					if (anchor === undefined)return;
+					if (anchor === undefined) return;
 					paneCtrl.setAnchor(anchor);
 				});
 
@@ -705,35 +708,35 @@
 				});
 
 				scope.$watch("closed", function (closed) {
-					if (closed === undefined)return;
+					if (closed === undefined) return;
 					paneCtrl.toggle(!closed);
 				});
 
 				scope.$watch("min", function (min) {
-					if (min === undefined)return;
+					if (min === undefined) return;
 					paneCtrl.setMinSize(min);
 				});
 
 				scope.$watch("max", function (max) {
-					if (max === undefined)return;
+					if (max === undefined) return;
 					paneCtrl.setMaxSize(max);
 				});
 
-				/*scope.$watch("order", function (order) {
-				 paneCtrl.setOrder(order);
-				 });*/
+				scope.$watch("order", function (order) {
+					if (order === undefined) return;
+					paneCtrl.setOrder(order);
+				});
 
 				scope.$watch("noResize", function (noResize) {
-					if (noResize === undefined)return;
+					if (noResize === undefined) return;
 					paneCtrl.setNoResize(faPaneUtil.stringToBoolean(noResize));
 				});
 
 				scope.$watch("noToggle", function (noToggle) {
-					if (noToggle === undefined)return;
+					if (noToggle === undefined) return;
 					paneCtrl.setNoToggle(faPaneUtil.stringToBoolean(noToggle));
 				});
 
-				// is this watcher useless?
 				scope.$watch("paneId", function (paneId, prevPaneId) {
 					if (prevPaneId) {
 						paneManager.remove(prevPaneId);
@@ -746,7 +749,7 @@
 				});
 
 				scope.$watch("handle", function (handle, prev) {
-					if (handle === undefined)return;
+					if (handle === undefined) return;
 					paneCtrl.setHandleSize(scope.$eval(handle));
 				});
 
@@ -758,7 +761,6 @@
 				 */
 				$transcludeScope.$on("fa-pane-attach", function (e, child) {
 					if (child !== paneCtrl) {
-
 						e.stopPropagation();
 						paneCtrl.addChild(child);
 					}
@@ -774,10 +776,6 @@
 				$transcludeScope.$on("$stateChangeSuccess", function () {
 					paneCtrl.$scheduleReflow();
 				});
-
-				//	paneCtrl.$transcludeScope.$on("$viewContentLoaded", function () {
-				//		paneCtrl.$scheduleReflow();
-				//	});
 
 				$transcludeScope.$on("$destroy", function () {
 					paneCtrl.$transcludeScope.$emit("fa-pane-detach", paneCtrl);
@@ -879,7 +877,7 @@
 				// return unless $pane
 				const $pane = $scope.$pane;
 
-				const el = $element[0];
+				const elem = $element[0];
 
 				const clickRadius = 5;
 				const clickTime = 300;
@@ -901,7 +899,9 @@
 
 				$scope.$watch(function () {
 					return $pane.noResize;
-				}, function (newVal) {
+				}, function (newVal, oldVal) {
+					if (newVal === oldVal) return;
+
 					if (newVal) {
 						$element.addClass("fa-pane-no-resize");
 					} else {
@@ -909,8 +909,8 @@
 					}
 				});
 
-				el.addEventListener("mousedown", function (e) {
-					if (e.button !== 0 || e.currentTarget !== e.target || $pane.noResize) {
+				elem.addEventListener("mousedown", function (event) {
+					if (event.button !== 0 || event.currentTarget !== event.target || $pane.noResize) {
 						return;
 					}
 
@@ -930,28 +930,28 @@
 					}
 
 					const startPos = {
-						x: e.screenX,
-						y: e.screenY
+						x: event.screenX,
+						y: event.screenY
 					};
-					const startCoord = e[coord];
+					const startCoord = event[coord];
 					const startSize = $pane.size;
 					const startTime = Date.now();
 
 					//pane.onHandleDown();
 
 					// Not sure if this really adds value, but added for compatibility
-					el.unselectable = "on";
-					el.onselectstart = function () {
+					elem.unselectable = "on";
+					elem.onselectstart = function () {
 						return false;
 					};
-					el.style.userSelect = el.style.MozUserSelect = el.style.msUserSelect = el.style.webkitUserSelect = "none";
+					elem.style.userSelect = elem.style.MozUserSelect = elem.style.msUserSelect = elem.style.webkitUserSelect = "none";
 
 					// Null out the event to re-use e and prevent memory leaks
 					//e.setCapture();
-					e.preventDefault();
-					e = null;
+					event.preventDefault();
+					event = null;
 
-					const handleMouseMove = function (e) {
+					const handleMouseMove = function (event) {
 
 						$pane.$onStartResize();
 
@@ -959,22 +959,19 @@
 						// according to movements then determine if those movements have been
 						// constrained by boundaries, other panes or min/max clauses
 						$scope.$apply(function () {
-							const targetSize = startSize + scale * (e[coord] - startCoord);
+							const targetSize = startSize + scale * (event[coord] - startCoord);
 
 							$pane.resize(targetSize);
 						});
 
-						// Null out the event in case of memory leaks
-						//e.setCapture();
-						e.preventDefault();
-						e = null;
+						event.preventDefault();
 					};
 
 					// Prevent the reflow logic from happening too often
 					const handleMouseMoveThrottled = throttle(handleMouseMove, 33, { trailing: false });
 
-					const handleMouseUp = function (e) {
-						const displacementSq = Math.pow(e.screenX - startPos.x, 2) + Math.pow(e.screenY - startPos.y, 2);
+					const handleMouseUp = function (event) {
+						const displacementSq = Math.pow(event.screenX - startPos.x, 2) + Math.pow(event.screenY - startPos.y, 2);
 						const timeElapsed = Date.now() - startTime;
 
 						$window.removeEventListener("mousemove", handleMouseMoveThrottled, true);
@@ -982,16 +979,13 @@
 
 						if (!(displacementSq <= Math.pow(clickRadius, 2) && timeElapsed <= clickTime)) {
 							// In case the mouse is released at the end of a throttle period
-							handleMouseMove(e);
+							handleMouseMove(event);
 						}
 
 						// clean up
 						$pane.$onStopResize();
 
-						// Null out the event in case of memory leaks
-						//e.releaseCapture();
-						e.preventDefault();
-						e = null;
+						event.preventDefault();
 					};
 
 					$window.addEventListener("mouseup", handleMouseUp, true);
