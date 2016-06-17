@@ -20,16 +20,16 @@
 	const ngModule = angular.module("fa.directive.borderLayout", [])
 
 	ngModule.factory("paneManager", function () {
+		const panes = {}
 		return {
-			panes: {},
 			get: function (paneId) {
-				return this.panes[paneId];
+				return panes[paneId];
 			},
 			set: function (paneId, pane) {
-				return this.panes[paneId] = pane;
+				return panes[paneId] = pane;
 			},
 			remove: function (paneId) {
-				return delete this.panes[paneId];
+				return delete panes[paneId];
 			}
 		};
 	})
