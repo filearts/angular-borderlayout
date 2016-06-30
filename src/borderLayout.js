@@ -625,16 +625,19 @@
 					},
 					reflowChildren: function (region) {
 						const $pane = this;
-						region || (region = $pane.$region);
 
-						$pane.children.sort(function (a, b) {
-							return a.order - b.order;
-						});
+						if ($pane.children.length) {
 
+							region || (region = $pane.$region);
 
-						for (let i = 0; i < $pane.children.length; i++) {
-							const child = $pane.children[i];
-							child.reflow(region);
+							$pane.children.sort(function (a, b) {
+								return a.order - b.order;
+							});
+
+							for (let i = 0; i < $pane.children.length; i++) {
+								const child = $pane.children[i];
+								child.reflow(region);
+							}
 						}
 					},
 					resize: function (targetSize) {
