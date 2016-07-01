@@ -18,9 +18,9 @@
 
 	'use strict'
 
-	const ngModule = angular.module("fa.directive.borderLayout", [])
+	const ngModule = angular.module('fa.directive.borderLayout', [])
 
-	ngModule.factory("paneManager", function () {
+	ngModule.factory('paneManager', function () {
 		const panes = {}
 		return {
 			get: function (paneId) {
@@ -63,7 +63,7 @@
 
 		/**
 		 * put in string like 'vertical' or 'horizontal' as orientation and
-		 * strings like '50% - 4px' or "1.3&" as the target to interpret.
+		 * strings like '50% - 4px' or '1.3&' as the target to interpret.
 		 *
 		 * @param {String} orientation
 		 * @param {String|Number} target
@@ -93,18 +93,18 @@
 			const available = this.getAvailableSize(orientation);
 
 			// Kill whitespace
-			target = target.replace(/\s+/mg, "");
+			target = target.replace(/\s+/mg, '');
 
 			// Allow for complex sizes, calculate them recursively
 			// e.g.: 50% - 4px
-			if ((terms = target.split("-")).length > 1) {
-				// todo: there is something logically wrong like "52px-62px-56px+65px", it can't cal-it correctly
-				return this.calculateSize(orientation, terms.shift()) - this.calculateSize(orientation, terms.join("+"));
+			if ((terms = target.split('-')).length > 1) {
+				// todo: there is something logically wrong like '52px-62px-56px+65px', it can't cal-it correctly
+				return this.calculateSize(orientation, terms.shift()) - this.calculateSize(orientation, terms.join('+'));
 			}
 
-			// interpret string like "52+62px"
-			if ((terms = target.split("+")).length > 1) {
-				return this.calculateSize(orientation, terms.shift()) + this.calculateSize(orientation, terms.join("+"));
+			// interpret string like '52+62px'
+			if ((terms = target.split('+')).length > 1) {
+				return this.calculateSize(orientation, terms.shift()) + this.calculateSize(orientation, terms.join('+'));
 			}
 
 			// strings like '56px'
@@ -122,7 +122,7 @@
 				return Math.round(total * parseFloat(matches[1]) / 100);
 			}
 
-			throw new Error("Unsupported size: " + target);
+			throw new Error('Unsupported size: ' + target);
 		};
 
 		/**
@@ -140,54 +140,54 @@
 			}
 
 			switch (anchor) {
-				case "north":
+				case 'north':
 					style = {
 						top: `${this.top}px`,
 						right: `${this.right}px`,
-						bottom: "auto",
+						bottom: 'auto',
 						left: `${this.left}px`,
 						height: `${size}px`,
-						width: "auto"
+						width: 'auto'
 					};
 					this.top += size;
 					break;
-				case "east":
+				case 'east':
 					style = {
 						top: `${this.top}px`,
 						right: `${this.right}px`,
 						bottom: `${this.bottom}px`,
-						left: "auto",
+						left: 'auto',
 						width: `${size}px`,
-						height: "auto"
+						height: 'auto'
 					};
 					this.right += size;
 					break;
-				case "south":
+				case 'south':
 					style = {
-						top: "auto",
+						top: 'auto',
 						right: `${this.right}px`,
 						bottom: `${this.bottom}px`,
 						left: `${this.left}px`,
 						height: `${size}px`,
-						width: "auto"
+						width: 'auto'
 					};
 					this.bottom += size;
 					break;
-				case "west":
+				case 'west':
 					style = {
 						top: `${this.top}px`,
-						right: "auto",
+						right: 'auto',
 						bottom: `${this.bottom}px`,
 						left: `${this.left}px`,
 						width: `${size}px`,
-						height: "auto"
+						height: 'auto'
 					};
 					this.left += size;
 					break;
 			}
 
 			if (size === 0) {
-				style.display = "none";
+				style.display = 'none';
 			}
 
 			return style;
@@ -209,9 +209,9 @@
 		 */
 		Region.prototype.getSize = function (orientation) {
 			switch (orientation) {
-				case "vertical":
+				case 'vertical':
 					return this.height;
-				case "horizontal":
+				case 'horizontal':
 					return this.width;
 			}
 		};
@@ -225,9 +225,9 @@
 		 */
 		Region.prototype.getAvailableSize = function (orientation) {
 			switch (orientation) {
-				case "vertical":
+				case 'vertical':
 					return this.height - this.top - this.bottom;
-				case "horizontal":
+				case 'horizontal':
 					return this.width - this.right - this.left;
 			}
 		};
@@ -243,12 +243,12 @@
 	ngModule.factory('faPaneUtil', function () {
 		function getOrientation(anchor) {
 			switch (anchor) {
-				case "north":
-				case "south":
-					return "vertical";
-				case "east":
-				case "west":
-					return "horizontal";
+				case 'north':
+				case 'south':
+					return 'vertical';
+				case 'east':
+				case 'west':
+					return 'horizontal';
 			}
 		}
 
@@ -262,31 +262,31 @@
 
 			if (size) {
 				switch (anchor) {
-					case "north":
-						style.bottom = "auto";
+					case 'north':
+						style.bottom = 'auto';
 						style.height = `${size}px`;
 						break;
-					case "east":
-						style.left = "auto";
+					case 'east':
+						style.left = 'auto';
 						style.width = `${size}px`;
 						break;
-					case "south":
-						style.top = "auto";
+					case 'south':
+						style.top = 'auto';
 						style.height = `${size}px`;
 						break;
-					case "west":
-						style.right = "auto";
+					case 'west':
+						style.right = 'auto';
 						style.width = `${size}px`;
 						break;
 				}
 			} else {
 				switch (anchor) {
-					case "north":
-					case "south":
+					case 'north':
+					case 'south':
 						style.height = 0;
 						break;
-					case "west":
-					case "east":
+					case 'west':
+					case 'east':
 						style.width = 0;
 						break;
 				}
@@ -297,30 +297,30 @@
 
 		function getHandleStyle(anchor, region, handleSize) {
 			switch (anchor) {
-				case "north":
+				case 'north':
 					return {
-						height: region.calculateSize('vertical', handleSize) + "px",
+						height: region.calculateSize('vertical', handleSize) + 'px',
 						right: 0,
 						left: 0,
 						bottom: 0
 					};
-				case "south":
+				case 'south':
 					return {
-						height: region.calculateSize('vertical', handleSize) + "px",
+						height: region.calculateSize('vertical', handleSize) + 'px',
 						right: 0,
 						left: 0,
 						top: 0
 					};
-				case "east":
+				case 'east':
 					return {
-						width: region.calculateSize('horizontal', handleSize) + "px",
+						width: region.calculateSize('horizontal', handleSize) + 'px',
 						top: 0,
 						bottom: 0,
 						left: 0
 					};
-				case "west":
+				case 'west':
 					return {
-						width: region.calculateSize('horizontal', handleSize) + "px",
+						width: region.calculateSize('horizontal', handleSize) + 'px',
 						top: 0,
 						bottom: 0,
 						right: 0
@@ -358,31 +358,31 @@
 		}
 	})
 
-	ngModule.directive("faPane", function ($window, $templateCache, paneManager, faPaneUtil) {
+	ngModule.directive('faPane', function ($window, $templateCache, paneManager, faPaneUtil) {
 
 		let promise = null;
 
 		// BEGIN DIRECTIVE DECLARATION
 		return {
-			restrict: "A",
+			restrict: 'A',
 			replace: true,
-			require: "faPane",
+			require: 'faPane',
 			priority: 1,
-			transclude: "element",
+			transclude: 'element',
 			scope: {
-				anchor: "@paneAnchor",
-				paneId: "@faPane",
-				size: "@paneSize",
-				min: "@paneMin",
-				max: "@paneMax",
-				handle: "@paneHandle",
-				closed: "=paneClosed",
-				order: "@paneOrder",
-				noResize: "@paneNoResize",
-				noToggle: "@paneNoToggle"
+				anchor: '@paneAnchor',
+				paneId: '@faPane',
+				size: '@paneSize',
+				min: '@paneMin',
+				max: '@paneMax',
+				handle: '@paneHandle',
+				closed: '=paneClosed',
+				order: '@paneOrder',
+				noResize: '@paneNoResize',
+				noToggle: '@paneNoToggle'
 			},
 			template: $templateCache.get('template/borderLayout.tpl.html'),
-			controllerAs: "$pane",
+			controllerAs: '$pane',
 			controller: function faPaneController($rootScope, $scope, $attrs, $timeout, Region) {
 				angular.extend(this, {
 					children: [],
@@ -508,16 +508,16 @@
 					},
 					$onStartResize: function () {
 						if (this.$parent) {
-							this.paneParent.$containerEl.addClass("fa-pane-resizing");
+							this.paneParent.$containerEl.addClass('fa-pane-resizing');
 						} else {
-							this.$containerEl.addClass("fa-pane-resizing");
+							this.$containerEl.addClass('fa-pane-resizing');
 						}
 					},
 					$onStopResize: function () {
 						if (this.$parent) {
-							this.paneParent.$containerEl.removeClass("fa-pane-resizing");
+							this.paneParent.$containerEl.removeClass('fa-pane-resizing');
 						} else {
-							this.$containerEl.removeClass("fa-pane-resizing");
+							this.$containerEl.removeClass('fa-pane-resizing');
 						}
 					},
 					addChild: function (child) {
@@ -525,7 +525,7 @@
 						this.children.push(child);
 
 						if (this.children.length) {
-							this.$containerEl.addClass("fa-pane-parent");
+							this.$containerEl.addClass('fa-pane-parent');
 						}
 
 						//this.$scheduleReflow();
@@ -534,10 +534,10 @@
 						return faPaneUtil.getOrientation(this.anchor);
 					},
 					onHandleDown: function () {
-						this.$containerEl.addClass("active");
+						this.$containerEl.addClass('active');
 					},
 					onHandleUp: function () {
-						this.$containerEl.removeClass("active");
+						this.$containerEl.removeClass('active');
 
 						this.$scheduleReflow();
 					},
@@ -549,7 +549,7 @@
 						}
 
 						if (!this.children.length) {
-							this.$containerEl.removeClass("fa-pane-parent");
+							this.$containerEl.removeClass('fa-pane-parent');
 						}
 
 						this.$scheduleReflow();
@@ -562,15 +562,15 @@
 						region || (region = new Region(width, height));
 
 						const anchor = $pane.anchor;
-						if (anchor === "north" || anchor === "east" || anchor === "south" || anchor === "west") {
+						if (anchor === 'north' || anchor === 'east' || anchor === 'south' || anchor === 'west') {
 
-							$pane.$containerEl.removeClass("fa-pane-orientation-vertical");
-							$pane.$containerEl.removeClass("fa-pane-orientation-horizontal");
+							$pane.$containerEl.removeClass('fa-pane-orientation-vertical');
+							$pane.$containerEl.removeClass('fa-pane-orientation-horizontal');
 
 							const orientation = faPaneUtil.getOrientation($pane.anchor);
 
-							$pane.$containerEl.addClass("fa-pane-orientation-" + orientation);
-							$pane.anchor && $pane.$containerEl.addClass("fa-pane-direction-" + $pane.anchor);
+							$pane.$containerEl.addClass('fa-pane-orientation-' + orientation);
+							$pane.anchor && $pane.$containerEl.addClass('fa-pane-direction-' + $pane.anchor);
 
 							const handleSize = region.calculateSize(orientation, !$pane.closed &&
 								$pane.handleSizeOpen || $pane.handleSizeClosed);
@@ -595,10 +595,10 @@
 							const styleScrollView = faPaneUtil.getScrollViewStyle($pane.anchor, size - handleSize);
 							const styleHandle = faPaneUtil.getHandleStyle($pane.anchor, region, handleSize);
 
-							$pane.$containerEl.attr("style", "").css(styleContainer);
-							$pane.$overlayEl.attr("style", "").css(styleScrollView);
-							$pane.$handleEl.attr("style", "").css(styleHandle);
-							$pane.$scrollViewEl.attr("style", "").css(styleScrollView);
+							$pane.$containerEl.attr('style', '').css(styleContainer);
+							$pane.$overlayEl.attr('style', '').css(styleScrollView);
+							$pane.$handleEl.attr('style', '').css(styleHandle);
+							$pane.$scrollViewEl.attr('style', '').css(styleScrollView);
 
 						} else {
 							$pane.$containerEl.css({
@@ -606,8 +606,8 @@
 								right: `${region.right}px`,
 								bottom: `${region.bottom}px`,
 								left: `${region.left}px`,
-								width: "auto",
-								height: "auto"
+								width: 'auto',
+								height: 'auto'
 							});
 						}
 
@@ -619,11 +619,11 @@
 						}
 
 						promise = $timeout(function () {
-							$rootScope.$broadcast("fa-pane-reflow-finished", $pane);
+							$rootScope.$broadcast('fa-pane-reflow-finished', $pane);
 							promise = null;
 						}, 400);
 
-						$rootScope.$broadcast("fa-pane-resize", $pane);
+						$rootScope.$broadcast('fa-pane-resize', $pane);
 					},
 					reflowChildren: function (region) {
 						const $pane = this;
@@ -653,17 +653,17 @@
 						$pane.targetSize = targetSize;
 
 						if (targetSize > $pane.maxSize) {
-							$pane.$containerEl.addClass("fa-pane-constrained");
+							$pane.$containerEl.addClass('fa-pane-constrained');
 							if ($pane.maxSize === $pane.size) {
 								return;
 							}
 						} else if (targetSize < $pane.minSize) {
-							$pane.$containerEl.addClass("fa-pane-constrained");
+							$pane.$containerEl.addClass('fa-pane-constrained');
 							if ($pane.minSize === $pane.size) {
 								return;
 							}
 						} else {
-							$pane.$containerEl.removeClass("fa-pane-constrained");
+							$pane.$containerEl.removeClass('fa-pane-constrained');
 						}
 
 						$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
@@ -678,9 +678,9 @@
 						$pane.closed = !open;
 
 						if ($pane.closed) {
-							$pane.$containerEl.addClass("fa-pane-closed");
+							$pane.$containerEl.addClass('fa-pane-closed');
 						} else {
-							$pane.$containerEl.removeClass("fa-pane-closed");
+							$pane.$containerEl.removeClass('fa-pane-closed');
 						}
 
 						$pane.$scheduleReflow();
@@ -703,47 +703,47 @@
 				/*
 				 * scope watchers
 				 */
-				scope.$watch("anchor", function (anchor) {
+				scope.$watch('anchor', function (anchor) {
 					if (anchor === undefined) return;
 					paneCtrl.setAnchor(anchor);
 				});
 
-				scope.$watch("size", function (targetSize) {
+				scope.$watch('size', function (targetSize) {
 					//if (targetSize === undefined)return;
 					paneCtrl.setTargetSize(targetSize);
 				});
 
-				scope.$watch("closed", function (closed) {
+				scope.$watch('closed', function (closed) {
 					if (closed === undefined) return;
 					paneCtrl.toggle(!closed);
 				});
 
-				scope.$watch("min", function (min) {
+				scope.$watch('min', function (min) {
 					if (min === undefined) return;
 					paneCtrl.setMinSize(min);
 				});
 
-				scope.$watch("max", function (max) {
+				scope.$watch('max', function (max) {
 					if (max === undefined) return;
 					paneCtrl.setMaxSize(max);
 				});
 
-				scope.$watch("order", function (order) {
+				scope.$watch('order', function (order) {
 					if (order === undefined) return;
 					paneCtrl.setOrder(order);
 				});
 
-				scope.$watch("noResize", function (noResize) {
+				scope.$watch('noResize', function (noResize) {
 					if (noResize === undefined) return;
 					paneCtrl.setNoResize(faPaneUtil.stringToBoolean(noResize));
 				});
 
-				scope.$watch("noToggle", function (noToggle) {
+				scope.$watch('noToggle', function (noToggle) {
 					if (noToggle === undefined) return;
 					paneCtrl.setNoToggle(faPaneUtil.stringToBoolean(noToggle));
 				});
 
-				scope.$watch("paneId", function (paneId, prevPaneId) {
+				scope.$watch('paneId', function (paneId, prevPaneId) {
 					if (prevPaneId) {
 						paneManager.remove(prevPaneId);
 						paneCtrl.$containerEl.removeClass('pane-' + prevPaneId)
@@ -754,7 +754,7 @@
 					paneCtrl.$containerEl.addClass('pane-' + paneCtrl.id)
 				});
 
-				scope.$watch("handle", function (handle, prev) {
+				scope.$watch('handle', function (handle, prev) {
 					if (handle === undefined) return;
 					paneCtrl.setHandleSize(scope.$eval(handle));
 				});
@@ -765,33 +765,33 @@
 				/*
 				 * directive scope listeners
 				 */
-				$transcludeScope.$on("fa-pane-attach", function (e, child) {
+				$transcludeScope.$on('fa-pane-attach', function (e, child) {
 					if (child !== paneCtrl) {
 						e.stopPropagation();
 						paneCtrl.addChild(child);
 					}
 				});
 
-				$transcludeScope.$on("fa-pane-detach", function (e, child) {
+				$transcludeScope.$on('fa-pane-detach', function (e, child) {
 					if (child !== paneCtrl) {
 						e.stopPropagation();
 						paneCtrl.removeChild(child);
 					}
 				});
 
-				$transcludeScope.$on("$stateChangeSuccess", function () {
+				$transcludeScope.$on('$stateChangeSuccess', function () {
 					paneCtrl.$scheduleReflow();
 				});
 
-				$transcludeScope.$on("$destroy", function () {
-					paneCtrl.$transcludeScope.$emit("fa-pane-detach", paneCtrl);
-					$window.removeEventListener("resize", handleWindowResize);
+				$transcludeScope.$on('$destroy', function () {
+					paneCtrl.$transcludeScope.$emit('fa-pane-detach', paneCtrl);
+					$window.removeEventListener('resize', handleWindowResize);
 				});
 
 				/*
 				 * window listener
 				 */
-				$window.addEventListener("resize", handleWindowResize);
+				$window.addEventListener('resize', handleWindowResize);
 
 				function handleWindowResize(e) {
 					e.stopPropagation();
@@ -802,7 +802,7 @@
 				 * transclude function
 				 */
 				transcludeFn($transcludeScope, function (clone, scope) {
-					clone.addClass("fa-pane-scroll-view");
+					clone.addClass('fa-pane-scroll-view');
 					el.append(clone);
 
 					paneCtrl.$containerEl = el;
@@ -810,13 +810,13 @@
 					paneCtrl.$handleEl = el.children().eq(1);
 					paneCtrl.$scrollViewEl = el.children().eq(2);
 
-					scope.$emit("fa-pane-attach", paneCtrl);
+					scope.$emit('fa-pane-attach', paneCtrl);
 				});
 			}
 		};
 	})
 
-	ngModule.directive("faPaneToggle", function () {
+	ngModule.directive('faPaneToggle', function () {
 		return {
 			restrict: 'A',
 			link: function ($scope, $el, $attrs) {
@@ -828,7 +828,7 @@
 		};
 	})
 
-	ngModule.directive("faPaneResizer", function ($window) {
+	ngModule.directive('faPaneResizer', function ($window) {
 
 		/**
 		 * throttle
@@ -877,8 +877,8 @@
 		}
 
 		return {
-			restrict: "A",
-			//require: "?^faPane",
+			restrict: 'A',
+			//require: '?^faPane',
 			link: function ($scope, $element, $attrs) {
 				// return unless $pane
 				const $pane = $scope.$pane;
@@ -892,13 +892,13 @@
 					return $pane.getOrientation();
 				}), function (newOrientation) {
 					switch (newOrientation) {
-						case "vertical":
-							$element.removeClass("vertical");
-							$element.addClass("horizontal");
+						case 'vertical':
+							$element.removeClass('vertical');
+							$element.addClass('horizontal');
 							break;
-						case "horizontal":
-							$element.addClass("vertical");
-							$element.removeClass("horizontal");
+						case 'horizontal':
+							$element.addClass('vertical');
+							$element.removeClass('horizontal');
 							break;
 					}
 				});
@@ -909,29 +909,29 @@
 					if (newVal === oldVal) return;
 
 					if (newVal) {
-						$element.addClass("fa-pane-no-resize");
+						$element.addClass('fa-pane-no-resize');
 					} else {
-						$element.removeClass("fa-pane-no-resize");
+						$element.removeClass('fa-pane-no-resize');
 					}
 				});
 
-				elem.addEventListener("mousedown", function (event) {
+				elem.addEventListener('mousedown', function (event) {
 					if (event.button !== 0 || event.currentTarget !== event.target || $pane.noResize) {
 						return;
 					}
 
 					const anchor = $pane.anchor;
 					let coord;
-					if (anchor === "north" || anchor === "south") {
-						coord = "clientY";
-					} else if (anchor === "west" || anchor === "east") {
-						coord = "clientX";
+					if (anchor === 'north' || anchor === 'south') {
+						coord = 'clientY';
+					} else if (anchor === 'west' || anchor === 'east') {
+						coord = 'clientX';
 					}
 
 					let scale;
-					if (anchor === "north" || anchor === "west") {
+					if (anchor === 'north' || anchor === 'west') {
 						scale = 1;
-					} else if (anchor === "south" || anchor === "east") {
+					} else if (anchor === 'south' || anchor === 'east') {
 						scale = -1;
 					}
 
@@ -946,11 +946,11 @@
 					//pane.onHandleDown();
 
 					// Not sure if this really adds value, but added for compatibility
-					elem.unselectable = "on";
+					elem.unselectable = 'on';
 					elem.onselectstart = function () {
 						return false;
 					};
-					elem.style.userSelect = elem.style.MozUserSelect = elem.style.msUserSelect = elem.style.webkitUserSelect = "none";
+					elem.style.userSelect = elem.style.MozUserSelect = elem.style.msUserSelect = elem.style.webkitUserSelect = 'none';
 
 					// Null out the event to re-use e and prevent memory leaks
 					//e.setCapture();
@@ -960,8 +960,8 @@
 					// Prevent the reflow logic from happening too often
 					const handleMouseMoveThrottled = throttle(handleMouseMove, 33, { trailing: false });
 
-					$window.addEventListener("mouseup", handleMouseUp, true);
-					$window.addEventListener("mousemove", handleMouseMoveThrottled, true);
+					$window.addEventListener('mouseup', handleMouseUp, true);
+					$window.addEventListener('mousemove', handleMouseMoveThrottled, true);
 
 					function handleMouseMove(event) {
 
@@ -983,8 +983,8 @@
 						const displacementSq = Math.pow(event.screenX - startPos.x, 2) + Math.pow(event.screenY - startPos.y, 2);
 						const timeElapsed = Date.now() - startTime;
 
-						$window.removeEventListener("mousemove", handleMouseMoveThrottled, true);
-						$window.removeEventListener("mouseup", handleMouseUp, true);
+						$window.removeEventListener('mousemove', handleMouseMoveThrottled, true);
+						$window.removeEventListener('mouseup', handleMouseUp, true);
 
 						if (!(displacementSq <= Math.pow(clickRadius, 2) && timeElapsed <= clickTime)) {
 							// In case the mouse is released at the end of a throttle period
