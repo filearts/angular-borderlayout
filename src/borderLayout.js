@@ -72,25 +72,25 @@
 		Region.prototype.calculateSize = function (orientation, target) {
 			let matches, terms;
 
-			if (target == null) {
+			if (!target) {
 				target = 0;
 			}
 
 			// the orientation size of the region
 			const total = this.getSize(orientation);
 
-			const available = this.getAvailableSize(orientation);
-
 			if (angular.isNumber(target)) {
 				if (target >= 1) {
 					return Math.round(target);
 				}
-				// target -> [0,1)
-				if (target >= 0) {
+				// target -> (0,1)
+				if (target > 0) {
 					return Math.round(target * total);
 				}
 				return 0;
 			}
+
+			const available = this.getAvailableSize(orientation);
 
 			// Kill whitespace
 			target = target.replace(/\s+/mg, "");
@@ -135,7 +135,7 @@
 		Region.prototype.consume = function (anchor, size) {
 			let style;
 
-			if (size == null) {
+			if (!size) {
 				size = 0;
 			}
 
