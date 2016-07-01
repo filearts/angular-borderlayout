@@ -241,6 +241,13 @@
 	})
 
 	ngModule.factory('faPaneUtil', function () {
+		
+		/**
+		 * orientation based on borderlayout
+		 * 
+		 * @param {string} anchor
+		 * @returns {*}
+		 */
 		function getOrientation(anchor) {
 			switch (anchor) {
 				case 'north':
@@ -252,6 +259,13 @@
 			}
 		}
 
+		/**
+		 * the basic position and size style of the scroll view
+		 * 
+		 * @param {string} anchor
+		 * @param {number} size
+		 * @returns {{top: number, right: number, bottom: number, left: number}}
+		 */
 		function getScrollViewStyle(anchor, size) {
 			let style = {
 				top: 0,
@@ -295,6 +309,14 @@
 			return style;
 		}
 
+		/**
+		 * the style of handle which may control the scroll view size
+		 * 
+		 * @param {string} anchor
+		 * @param {Region} region
+		 * @param {string} handleSize
+		 * @returns {*}
+		 */
 		function getHandleStyle(anchor, region, handleSize) {
 			switch (anchor) {
 				case 'north':
@@ -342,6 +364,12 @@
 			return fun;
 		})();
 
+		/**
+		 * convert [boolean] sting to Boolean
+		 * 
+		 * @param {string} str
+		 * @returns {boolean}
+		 */
 		function stringToBoolean(str) {
 			if (angular.isString(str)) {
 				str = angular.lowercase(str) === 'true';
