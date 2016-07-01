@@ -112,9 +112,9 @@
 				return parseInt(matches[1], 10);
 			}
 
-			// strings like '10.2&' mean multiple to the available size
+			// strings like '10.2&' mean multiple to the available size in percentage
 			if (matches = target.match(/^(\d+(?:\.\d+)?)&$/)) {
-				return Math.round(available * parseFloat(matches[1]));
+				return Math.round(available * parseFloat(matches[1]) / 100);
 			}
 
 			// '10%' multiple the total size in percentage
