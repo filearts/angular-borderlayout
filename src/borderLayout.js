@@ -117,7 +117,7 @@
 				return Math.round(available * parseFloat(matches[1]));
 			}
 
-			// '10%' multiple the total size
+			// '10%' multiple the total size in percentage
 			if (matches = target.match(/^(\d+(?:\.\d+)?)%$/)) {
 				return Math.round(total * parseFloat(matches[1]) / 100);
 			}
@@ -128,8 +128,8 @@
 		/**
 		 * adjust the region size based on anchor
 		 *
-		 * @param anchor
-		 * @param size
+		 * @param {string} anchor
+		 * @param {number} size
 		 * @returns {*}
 		 */
 		Region.prototype.consume = function (anchor, size) {
@@ -203,6 +203,7 @@
 
 		/**
 		 * Get the region's size on target orientation
+		 *
 		 * @param orientation
 		 * @returns {number|*}
 		 */
@@ -218,6 +219,7 @@
 		/**
 		 * calculate the available size ot target orientation
 		 *
+		 * todo: this method is the same as innerRegion.getSize, it may make the getInnerRegion as a property
 		 * @param orientation
 		 * @returns {number}
 		 */
