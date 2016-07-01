@@ -118,7 +118,7 @@ describe('Region', function () {
 		it('should return round to 270 if target = 5.4& with sample region', function () {
 			var region = createSampleRegion()
 			var size = region.calculateSize('vertical', '5.4&')
-			expect(size).to.equal(270)
+			expect(size).to.equal(3)
 		})
 
 		it('should return round to 5 if target = 5.4% with sample region', function () {
