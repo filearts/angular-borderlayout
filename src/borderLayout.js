@@ -114,7 +114,7 @@
 
 			// strings like '10.2&' mean multiple to the available size
 			if (matches = target.match(/^(\d+(?:\.\d+)?)&$/)) {
-				return Math.round(available * parseFloat(matches[1]) / 100);
+				return Math.round(available * parseFloat(matches[1]));
 			}
 
 			// '10%' multiple the total size
