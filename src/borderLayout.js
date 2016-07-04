@@ -18,6 +18,8 @@
 
 	'use strict'
 
+	const directiveName = 'faPane'
+
 	const ngModule = angular.module('fa.directive.borderLayout', [])
 
 	ngModule.factory('paneManager', function () {
@@ -386,7 +388,7 @@
 		}
 	})
 
-	ngModule.directive('faPane', function ($window, $templateCache, paneManager, faPaneUtil) {
+	ngModule.directive(directiveName, function ($window, $templateCache, paneManager, faPaneUtil) {
 
 		let promise = null;
 
@@ -394,12 +396,12 @@
 		return {
 			restrict: 'A',
 			replace: true,
-			require: 'faPane',
+			require: directiveName,
 			priority: 1,
 			transclude: 'element',
 			scope: {
 				anchor: '@paneAnchor',
-				paneId: '@faPane',
+				paneId: `@${directiveName}`,
 				size: '@paneSize',
 				min: '@paneMin',
 				max: '@paneMax',
@@ -720,7 +722,7 @@
 					paneCtrl.order = serialId;
 				}
 
-				paneCtrl.id = attr['faPane'];
+				paneCtrl.id = attr[directiveName];
 
 				/*
 				 * scope watchers
