@@ -241,10 +241,10 @@
 	})
 
 	ngModule.factory('faPaneUtil', function () {
-		
+
 		/**
 		 * orientation based on borderlayout
-		 * 
+		 *
 		 * @param {string} anchor
 		 * @returns {*}
 		 */
@@ -261,7 +261,7 @@
 
 		/**
 		 * the basic position and size style of the scroll view
-		 * 
+		 *
 		 * @param {string} anchor
 		 * @param {number} size
 		 * @returns {{top: number, right: number, bottom: number, left: number}}
@@ -311,7 +311,7 @@
 
 		/**
 		 * the style of handle which may control the scroll view size
-		 * 
+		 *
 		 * @param {string} anchor
 		 * @param {Region} region
 		 * @param {string} handleSize
@@ -366,7 +366,7 @@
 
 		/**
 		 * convert [boolean] sting to Boolean
-		 * 
+		 *
 		 * @param {string} str
 		 * @returns {boolean}
 		 */
@@ -519,12 +519,11 @@
 					// Schedule a re-flow later in the digest cycle, but do not reflow
 					// more than necessary
 					$scheduleReflow: function () {
-						let $pane = this;
-						if ($pane.paneParent) {
-							$pane.paneParent.$scheduleReflow();
-						} else if (!$pane.$reflowScheduled) {
-							$pane.$reflowScheduled = true;
-
+						if (this.paneParent) {
+							this.paneParent.$scheduleReflow();
+						} else if (!this.$reflowScheduled) {
+							this.$reflowScheduled = true;
+							let $pane = this;
 							$rootScope.$evalAsync(function () {
 								if ($pane.$reflowScheduled) {
 									$pane.reflow();
@@ -583,53 +582,52 @@
 						this.$scheduleReflow();
 					},
 					reflow: function (region) {
-						let $pane = this;
-						const width = $pane.$containerEl[0].offsetWidth;
-						const height = $pane.$containerEl[0].offsetHeight;
+						const width = this.$containerEl[0].offsetWidth;
+						const height = this.$containerEl[0].offsetHeight;
 
 						region || (region = new Region(width, height));
 
-						const anchor = $pane.anchor;
+						const anchor = this.anchor;
 						if (anchor === 'north' || anchor === 'east' || anchor === 'south' || anchor === 'west') {
 
-							$pane.$containerEl.removeClass('fa-pane-orientation-vertical');
-							$pane.$containerEl.removeClass('fa-pane-orientation-horizontal');
+							this.$containerEl.removeClass('fa-pane-orientation-vertical');
+							this.$containerEl.removeClass('fa-pane-orientation-horizontal');
 
-							const orientation = faPaneUtil.getOrientation($pane.anchor);
+							const orientation = faPaneUtil.getOrientation(this.anchor);
 
-							$pane.$containerEl.addClass('fa-pane-orientation-' + orientation);
-							$pane.anchor && $pane.$containerEl.addClass('fa-pane-direction-' + $pane.anchor);
+							this.$containerEl.addClass('fa-pane-orientation-' + orientation);
+							this.anchor && this.$containerEl.addClass('fa-pane-direction-' + this.anchor);
 
-							const handleSize = region.calculateSize(orientation, !$pane.closed &&
-								$pane.handleSizeOpen || $pane.handleSizeClosed);
+							const handleSize = region.calculateSize(orientation, !this.closed &&
+								this.handleSizeOpen || this.handleSizeClosed);
 
 							let size = handleSize;
-							if (!$pane.closed) {
-								size = region.calculateSize(orientation, !$pane.closed && $pane.targetSize || handleSize);
+							if (!this.closed) {
+								size = region.calculateSize(orientation, !this.closed && this.targetSize || handleSize);
 
-								$pane.maxSize = $pane.max === Number.MAX_VALUE ?
-									region.getSize(faPaneUtil.getOrientation($pane.anchor)) : region.calculateSize(orientation, $pane.max);
-								$pane.minSize = region.calculateSize(orientation, $pane.min);
+								this.maxSize = this.max === Number.MAX_VALUE ?
+									region.getSize(faPaneUtil.getOrientation(this.anchor)) : region.calculateSize(orientation, this.max);
+								this.minSize = region.calculateSize(orientation, this.min);
 
-								size = Math.min(size, $pane.maxSize);
-								size = Math.max(size, $pane.minSize);
+								size = Math.min(size, this.maxSize);
+								size = Math.max(size, this.minSize);
 								size = Math.min(size, region.getAvailableSize(orientation));
 								size = Math.max(size, handleSize);
 							}
 
-							$pane.size = size;
+							this.size = size;
 
-							const styleContainer = region.consume($pane.anchor, size);
-							const styleScrollView = faPaneUtil.getScrollViewStyle($pane.anchor, size - handleSize);
-							const styleHandle = faPaneUtil.getHandleStyle($pane.anchor, region, handleSize);
+							const styleContainer = region.consume(this.anchor, size);
+							const styleScrollView = faPaneUtil.getScrollViewStyle(this.anchor, size - handleSize);
+							const styleHandle = faPaneUtil.getHandleStyle(this.anchor, region, handleSize);
 
-							$pane.$containerEl.attr('style', '').css(styleContainer);
-							$pane.$overlayEl.attr('style', '').css(styleScrollView);
-							$pane.$handleEl.attr('style', '').css(styleHandle);
-							$pane.$scrollViewEl.attr('style', '').css(styleScrollView);
+							this.$containerEl.attr('style', '').css(styleContainer);
+							this.$overlayEl.attr('style', '').css(styleScrollView);
+							this.$handleEl.attr('style', '').css(styleHandle);
+							this.$scrollViewEl.attr('style', '').css(styleScrollView);
 
 						} else {
-							$pane.$containerEl.css({
+							this.$containerEl.css({
 								top: `${region.top}px`,
 								right: `${region.right}px`,
 								bottom: `${region.bottom}px`,
@@ -639,79 +637,75 @@
 							});
 						}
 
-						$pane.$region = region.clone();
-						$pane.reflowChildren($pane.$region.getInnerRegion());
+						this.$region = region.clone();
+						this.reflowChildren(this.$region.getInnerRegion());
 
 						if (promise !== null) {
 							$timeout.cancel(promise);
 						}
 
 						promise = $timeout(function () {
-							$rootScope.$broadcast('fa-pane-reflow-finished', $pane);
+							$rootScope.$broadcast('fa-pane-reflow-finished', this);
 							promise = null;
 						}, 400);
 
-						$rootScope.$broadcast('fa-pane-resize', $pane);
+						$rootScope.$broadcast('fa-pane-resize', this);
 					},
 					reflowChildren: function (region) {
-						const $pane = this;
+						if (this.children.length) {
 
-						if ($pane.children.length) {
+							region || (region = this.$region);
 
-							region || (region = $pane.$region);
-
-							$pane.children.sort(function (a, b) {
+							this.children.sort(function (a, b) {
 								return a.order - b.order;
 							});
 
-							for (let i = 0; i < $pane.children.length; i++) {
-								const child = $pane.children[i];
+							for (let i = 0; i < this.children.length; i++) {
+								const child = this.children[i];
 								child.reflow(region);
 							}
 						}
 					},
 					resize: function (targetSize) {
-						const $pane = this;
 						if (targetSize == null) {
-							targetSize = $pane.targetSize;
+							targetSize = this.targetSize;
 						}
 
-						if (targetSize === $pane.size) return;
+						if (targetSize === this.size) return;
 
-						$pane.targetSize = targetSize;
+						this.targetSize = targetSize;
 
-						if (targetSize > $pane.maxSize) {
-							$pane.$containerEl.addClass('fa-pane-constrained');
-							if ($pane.maxSize === $pane.size) {
+						if (targetSize > this.maxSize) {
+							this.$containerEl.addClass('fa-pane-constrained');
+							if (this.maxSize === this.size) {
 								return;
 							}
-						} else if (targetSize < $pane.minSize) {
-							$pane.$containerEl.addClass('fa-pane-constrained');
-							if ($pane.minSize === $pane.size) {
+						} else if (targetSize < this.minSize) {
+							this.$containerEl.addClass('fa-pane-constrained');
+							if (this.minSize === this.size) {
 								return;
 							}
 						} else {
-							$pane.$containerEl.removeClass('fa-pane-constrained');
+							this.$containerEl.removeClass('fa-pane-constrained');
 						}
 
-						$pane.paneParent.reflowChildren($pane.paneParent.$region.getInnerRegion());
+						this.paneParent.reflowChildren(this.paneParent.$region.getInnerRegion());
 					},
 					toggle: function (open) {
-						const $pane = this;
 
 						if (open == null) {
-							open = !!$pane.closed;
+							open = !!this.closed;
 						}
 
-						$pane.closed = !open;
+						this.closed = !open;
 
-						if ($pane.closed) {
-							$pane.$containerEl.addClass('fa-pane-closed');
+						if (this.closed) {
+							this.$containerEl.addClass('fa-pane-closed');
 						} else {
-							$pane.$containerEl.removeClass('fa-pane-closed');
+							this.$containerEl.removeClass('fa-pane-closed');
 						}
 
-						$pane.$scheduleReflow();
+						this.$scheduleReflow();
 					}
 				});
 			},
