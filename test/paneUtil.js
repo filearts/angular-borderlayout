@@ -9,9 +9,9 @@ describe('', function () {
 
 	var paneUtil, Region;
 
-	beforeEach(inject(function (_faPaneUtil_, _Region_) {
+	beforeEach(inject(function (_paneUtil_, _Region_) {
 		// The injector unwraps the underscores (_) from around the parameter names when matching
-		paneUtil = _faPaneUtil_;
+		paneUtil = _paneUtil_;
 		Region = _Region_
 	}));
 
