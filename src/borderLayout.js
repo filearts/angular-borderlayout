@@ -711,7 +711,7 @@
 					}
 				});
 			},
-			link: function postlink(scope, el, attr, paneCtrl, transcludeFn) {
+			link: function postlink(scope, element, attr, paneCtrl, transcludeFn) {
 				// Tool used to force elements into their compile order
 				const serialId = faPaneUtil.generateSerialId();
 
@@ -803,10 +803,6 @@
 					}
 				});
 
-				$transcludeScope.$on('$stateChangeSuccess', function () {
-					paneCtrl.$scheduleReflow();
-				});
-
 				$transcludeScope.$on('$destroy', function () {
 					paneCtrl.$transcludeScope.$emit('fa-pane-detach', paneCtrl);
 					$window.removeEventListener('resize', handleWindowResize);
@@ -827,12 +823,12 @@
 				 */
 				transcludeFn($transcludeScope, function (clone, scope) {
 					clone.addClass('fa-pane-scroll-view');
-					el.append(clone);
+					element.append(clone);
 
-					paneCtrl.$containerEl = el;
-					paneCtrl.$overlayEl = el.children().eq(0);
-					paneCtrl.$handleEl = el.children().eq(1);
-					paneCtrl.$scrollViewEl = el.children().eq(2);
+					paneCtrl.$containerEl = element;
+					paneCtrl.$overlayEl = element.children().eq(0);
+					paneCtrl.$handleEl = element.children().eq(1);
+					paneCtrl.$scrollViewEl = element.children().eq(2);
 
 					scope.$emit('fa-pane-attach', paneCtrl);
 				});
