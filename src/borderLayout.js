@@ -18,50 +18,172 @@
 
 	'use strict'
 
-	const directiveName = 'faPane'
-
-	const ngModule = angular.module('fa.directive.borderLayout', [])
-
-	ngModule.factory('paneManager', function () {
-		const panes = {}
-		return {
-			get: function (paneId) {
-				return panes[paneId];
-			},
-			set: function (paneId, pane) {
-				return panes[paneId] = pane;
-			},
-			remove: function (paneId) {
-				return delete panes[paneId];
+	const paneUtil = {
+		/**
+		 * orientation based on borderlayout
+		 *
+		 * @param {string} anchor
+		 * @returns {*}
+		 */
+		getOrientation(anchor) {
+			switch (anchor) {
+				case 'north':
+				case 'south':
+					return 'vertical';
+				case 'east':
+				case 'west':
+					return 'horizontal';
 			}
-		};
-	})
-
-	ngModule.factory('Region', function () {
+		},
 
 		/**
-		 * region represents a rectangle container, could be any block dom element(assuming)
+		 * the basic position and size style of the scroll view
 		 *
-		 * @param {Number} width
-		 * @param {Number} height
-		 * @param {Number} [top]
-		 * @param {Number} [right]
-		 * @param {Number} [bottom]
-		 * @param {Number} [left]
-		 * @constructor
+		 * @param {string} anchor
+		 * @param {number} size
+		 * @returns {{top: number, right: number, bottom: number, left: number}}
 		 */
-		function Region(width, height, top, right, bottom, left) {
-			this.width = width != null ? width : 0;
-			this.height = height != null ? height : 0;
-			this.top = top != null ? top : 0;
-			this.right = right != null ? right : 0;
-			this.bottom = bottom != null ? bottom : 0;
-			this.left = left != null ? left : 0;
-		}
+		getScrollViewStyle: function (anchor, size) {
+			let style = {
+				top: 0,
+				right: 0,
+				bottom: 0,
+				left: 0
+			};
 
-		Region.prototype.clone = function () {
+			if (size) {
+				switch (anchor) {
+					case 'north':
+						style.bottom = 'auto';
+						style.height = `${size}px`;
+						break;
+					case 'east':
+						style.left = 'auto';
+						style.width = `${size}px`;
+						break;
+					case 'south':
+						style.top = 'auto';
+						style.height = `${size}px`;
+						break;
+					case 'west':
+						style.right = 'auto';
+						style.width = `${size}px`;
+						break;
+				}
+			} else {
+				switch (anchor) {
+					case 'north':
+					case 'south':
+						style.height = 0;
+						break;
+					case 'west':
+					case 'east':
+						style.width = 0;
+						break;
+				}
+			}
+
+			return style;
+		},
+
+		/**
+		 * the style of handle which may control the scroll view size
+		 *
+		 * @param {string} anchor
+		 * @param {Region} region
+		 * @param {string|number} handleSize
+		 * @returns {*}
+		 */
+		getHandleStyle: function (anchor, region, handleSize) {
+			switch (anchor) {
+				case 'north':
+					return {
+						height: region.calculateSize('vertical', handleSize) + 'px',
+						right: 0,
+						left: 0,
+						bottom: 0
+					};
+				case 'south':
+					return {
+						height: region.calculateSize('vertical', handleSize) + 'px',
+						right: 0,
+						left: 0,
+						top: 0
+					};
+				case 'east':
+					return {
+						width: region.calculateSize('horizontal', handleSize) + 'px',
+						top: 0,
+						bottom: 0,
+						left: 0
+					};
+				case 'west':
+					return {
+						width: region.calculateSize('horizontal', handleSize) + 'px',
+						top: 0,
+						bottom: 0,
+						right: 0
+					};
+			}
+		},
+
+		generateSerialId: (function () {
+			let counter = 0;
+
+			const fun = function () {
+				return counter++;
+			};
+
+			fun.peek = function () {
+				return counter;
+			};
+
+			return fun;
+		})(),
+
+		/**
+		 * convert [boolean] sting to Boolean
+		 *
+		 * @param {string} str
+		 * @returns {boolean}
+		 */
+		stringToBoolean: function (str) {
+			let res = str
+			if (angular.isString(str)) {
+				res = angular.lowercase(str) === 'true';
+			}
+
+			return !!res
+		}
+	}
+
+	/**
+	 * @class Region
+	 * region represents a rectangle container, could be any block dom element(assuming)
+	 *
+	 * @param {Number} width
+	 * @param {Number} height
+	 * @param {Number} [top]
+	 * @param {Number} [right]
+	 * @param {Number} [bottom]
+	 * @param {Number} [left]
+	 * @constructor
+	 */
+	function Region(width, height, top, right, bottom, left) {
+		this.width = width != null ? width : 0;
+		this.height = height != null ? height : 0;
+		this.top = top != null ? top : 0;
+		this.right = right != null ? right : 0;
+		this.bottom = bottom != null ? bottom : 0;
+		this.left = left != null ? left : 0;
+	}
+
+	Region.prototype.constructor = Region
+
+	angular.extend(Region.prototype, {
+		clone() {
 			return new Region(this.width, this.height, this.top, this.right, this.bottom, this.left);
-		};
+		},
 
 		/**
 		 * put in string like 'vertical' or 'horizontal' as orientation and
@@ -71,7 +193,7 @@
 		 * @param {String|Number} target
 		 * @returns {Number}
 		 */
-		Region.prototype.calculateSize = function (orientation, target) {
+		calculateSize(orientation, target) {
 			let matches, terms;
 
 			if (!target) {
@@ -125,7 +247,7 @@
 			}
 
 			throw new Error('Unsupported size: ' + target);
-		};
+		},
 
 		/**
 		 * adjust the region size based on anchor
@@ -134,7 +256,7 @@
 		 * @param {number} size
 		 * @returns {*}
 		 */
-		Region.prototype.consume = function (anchor, size) {
+		consume(anchor, size) {
 			let style;
 
 			if (!size) {
@@ -193,15 +315,15 @@
 			}
 
 			return style;
-		};
+		},
 
 		/**
 		 * calculate the inner region without position values
 		 * @returns {Region}
 		 */
-		Region.prototype.getInnerRegion = function () {
+		getInnerRegion() {
 			return new Region(this.width - this.right - this.left, this.height - this.top - this.bottom);
-		};
+		},
 
 		/**
 		 * Get the region's size on target orientation
@@ -209,14 +331,14 @@
 		 * @param orientation
 		 * @returns {number|*}
 		 */
-		Region.prototype.getSize = function (orientation) {
+		getSize(orientation) {
 			switch (orientation) {
 				case 'vertical':
 					return this.height;
 				case 'horizontal':
 					return this.width;
 			}
-		};
+		},
 
 		/**
 		 * calculate the available size ot target orientation
@@ -225,170 +347,48 @@
 		 * @param orientation
 		 * @returns {number}
 		 */
-		Region.prototype.getAvailableSize = function (orientation) {
+		getAvailableSize(orientation) {
 			switch (orientation) {
 				case 'vertical':
 					return this.height - this.top - this.bottom;
 				case 'horizontal':
 					return this.width - this.right - this.left;
 			}
-		};
+		},
 
-		Region.prototype.toString = function () {
+		toString() {
 			return `{${this.top}, ${this.right}, ${this.bottom}, ${this.left}}, {${this.width}, ${this.height}}`;
-		};
-
-		return Region;
-
+		}
 	})
 
-	ngModule.factory('faPaneUtil', function () {
+	const directiveName = 'faPane'
 
-		/**
-		 * orientation based on borderlayout
-		 *
-		 * @param {string} anchor
-		 * @returns {*}
-		 */
-		function getOrientation(anchor) {
-			switch (anchor) {
-				case 'north':
-				case 'south':
-					return 'vertical';
-				case 'east':
-				case 'west':
-					return 'horizontal';
-			}
-		}
+	const ngModule = angular.module('fa.directive.borderLayout', [])
 
-		/**
-		 * the basic position and size style of the scroll view
-		 *
-		 * @param {string} anchor
-		 * @param {number} size
-		 * @returns {{top: number, right: number, bottom: number, left: number}}
-		 */
-		function getScrollViewStyle(anchor, size) {
-			let style = {
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0
-			};
-
-			if (size) {
-				switch (anchor) {
-					case 'north':
-						style.bottom = 'auto';
-						style.height = `${size}px`;
-						break;
-					case 'east':
-						style.left = 'auto';
-						style.width = `${size}px`;
-						break;
-					case 'south':
-						style.top = 'auto';
-						style.height = `${size}px`;
-						break;
-					case 'west':
-						style.right = 'auto';
-						style.width = `${size}px`;
-						break;
-				}
-			} else {
-				switch (anchor) {
-					case 'north':
-					case 'south':
-						style.height = 0;
-						break;
-					case 'west':
-					case 'east':
-						style.width = 0;
-						break;
-				}
-			}
-
-			return style;
-		}
-
-		/**
-		 * the style of handle which may control the scroll view size
-		 *
-		 * @param {string} anchor
-		 * @param {Region} region
-		 * @param {string} handleSize
-		 * @returns {*}
-		 */
-		function getHandleStyle(anchor, region, handleSize) {
-			switch (anchor) {
-				case 'north':
-					return {
-						height: region.calculateSize('vertical', handleSize) + 'px',
-						right: 0,
-						left: 0,
-						bottom: 0
-					};
-				case 'south':
-					return {
-						height: region.calculateSize('vertical', handleSize) + 'px',
-						right: 0,
-						left: 0,
-						top: 0
-					};
-				case 'east':
-					return {
-						width: region.calculateSize('horizontal', handleSize) + 'px',
-						top: 0,
-						bottom: 0,
-						left: 0
-					};
-				case 'west':
-					return {
-						width: region.calculateSize('horizontal', handleSize) + 'px',
-						top: 0,
-						bottom: 0,
-						right: 0
-					};
-			}
-		}
-
-		const generateSerialId = (function () {
-			let counter = 0;
-
-			const fun = function () {
-				return counter++;
-			};
-
-			fun.peek = function () {
-				return counter;
-			};
-
-			return fun;
-		})();
-
-		/**
-		 * convert [boolean] sting to Boolean
-		 *
-		 * @param {string} str
-		 * @returns {boolean}
-		 */
-		function stringToBoolean(str) {
-			if (angular.isString(str)) {
-				str = angular.lowercase(str) === 'true';
-			}
-			return !!str
-		}
-
+	ngModule.factory('paneManager', function () {
+		const panes = {}
 		return {
-			getOrientation,
-			getScrollViewStyle,
-			getHandleStyle,
-			generateSerialId,
-			stringToBoolean
-		}
+			get: function (paneId) {
+				return panes[paneId];
+			},
+			set: function (paneId, pane) {
+				return panes[paneId] = pane;
+			},
+			remove: function (paneId) {
+				return delete panes[paneId];
+			}
+		};
 	})
 
-	ngModule.directive(directiveName, function ($window, $templateCache, paneManager, faPaneUtil) {
+	ngModule.factory('Region', function () {
+		return Region;
+	})
+
+	ngModule.factory('paneUtil', function () {
+		return paneUtil
+	})
+
+	ngModule.directive(directiveName, function ($window, $templateCache, paneManager, paneUtil) {
 
 		let promise = null;
 
@@ -560,7 +560,7 @@
 						//this.$scheduleReflow();
 					},
 					getOrientation: function () {
-						return faPaneUtil.getOrientation(this.anchor);
+						return paneUtil.getOrientation(this.anchor);
 					},
 					onHandleDown: function () {
 						this.$containerEl.addClass('active');
@@ -595,7 +595,7 @@
 							this.$containerEl.removeClass('fa-pane-orientation-vertical');
 							this.$containerEl.removeClass('fa-pane-orientation-horizontal');
 
-							const orientation = faPaneUtil.getOrientation(this.anchor);
+							const orientation = paneUtil.getOrientation(this.anchor);
 
 							this.$containerEl.addClass('fa-pane-orientation-' + orientation);
 							this.anchor && this.$containerEl.addClass('fa-pane-direction-' + this.anchor);
@@ -608,7 +608,7 @@
 								size = region.calculateSize(orientation, !this.closed && this.targetSize || handleSize);
 
 								this.maxSize = this.max === Number.MAX_VALUE ?
-									region.getSize(faPaneUtil.getOrientation(this.anchor)) : region.calculateSize(orientation, this.max);
+									region.getSize(paneUtil.getOrientation(this.anchor)) : region.calculateSize(orientation, this.max);
 								this.minSize = region.calculateSize(orientation, this.min);
 
 								size = Math.min(size, this.maxSize);
@@ -620,8 +620,8 @@
 							this.size = size;
 
 							const styleContainer = region.consume(this.anchor, size);
-							const styleScrollView = faPaneUtil.getScrollViewStyle(this.anchor, size - handleSize);
-							const styleHandle = faPaneUtil.getHandleStyle(this.anchor, region, handleSize);
+							const styleScrollView = paneUtil.getScrollViewStyle(this.anchor, size - handleSize);
+							const styleHandle = paneUtil.getHandleStyle(this.anchor, region, handleSize);
 
 							this.$containerEl.attr('style', '').css(styleContainer);
 							this.$overlayEl.attr('style', '').css(styleScrollView);
@@ -713,7 +713,7 @@
 			},
 			link: function postlink(scope, element, attr, paneCtrl, transcludeFn) {
 				// Tool used to force elements into their compile order
-				const serialId = faPaneUtil.generateSerialId();
+				const serialId = paneUtil.generateSerialId();
 
 				if (paneCtrl.order == null) {
 					paneCtrl.order = serialId;
@@ -756,12 +756,12 @@
 
 				scope.$watch('noResize', function (noResize) {
 					if (noResize === undefined) return;
-					paneCtrl.setNoResize(faPaneUtil.stringToBoolean(noResize));
+					paneCtrl.setNoResize(paneUtil.stringToBoolean(noResize));
 				});
 
 				scope.$watch('noToggle', function (noToggle) {
 					if (noToggle === undefined) return;
-					paneCtrl.setNoToggle(faPaneUtil.stringToBoolean(noToggle));
+					paneCtrl.setNoToggle(paneUtil.stringToBoolean(noToggle));
 				});
 
 				scope.$watch('paneId', function (paneId, prevPaneId) {
