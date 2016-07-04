@@ -715,9 +715,6 @@
 				// Tool used to force elements into their compile order
 				const serialId = faPaneUtil.generateSerialId();
 
-				const $transcludeScope = scope.$parent.$new();
-				$transcludeScope.$pane = scope.$pane = paneCtrl;
-
 				if (paneCtrl.order == null) {
 					paneCtrl.order = serialId;
 				}
@@ -778,34 +775,9 @@
 					paneCtrl.$containerEl.addClass('pane-' + paneCtrl.id)
 				});
 
-				scope.$watch('handle', function (handle, prev) {
+				scope.$watch('handle', function (handle) {
 					if (handle === undefined) return;
 					paneCtrl.setHandleSize(scope.$eval(handle));
-				});
-
-				paneCtrl.$isolateScope = scope;
-				paneCtrl.$transcludeScope = $transcludeScope;
-
-				/*
-				 * directive scope listeners
-				 */
-				$transcludeScope.$on('fa-pane-attach', function (e, child) {
-					if (child !== paneCtrl) {
-						e.stopPropagation();
-						paneCtrl.addChild(child);
-					}
-				});
-
-				$transcludeScope.$on('fa-pane-detach', function (e, child) {
-					if (child !== paneCtrl) {
-						e.stopPropagation();
-						paneCtrl.removeChild(child);
-					}
-				});
-
-				$transcludeScope.$on('$destroy', function () {
-					paneCtrl.$transcludeScope.$emit('fa-pane-detach', paneCtrl);
-					$window.removeEventListener('resize', handleWindowResize);
 				});
 
 				/*
@@ -821,7 +793,7 @@
 				/*
 				 * transclude function
 				 */
-				transcludeFn($transcludeScope, function (clone, scope) {
+				transcludeFn(function (clone, $transcludeScope) {
 					clone.addClass('fa-pane-scroll-view');
 					element.append(clone);
 
@@ -829,6 +801,30 @@
 					paneCtrl.$overlayEl = element.children().eq(0);
 					paneCtrl.$handleEl = element.children().eq(1);
 					paneCtrl.$scrollViewEl = element.children().eq(2);
+
+					$transcludeScope.$pane = paneCtrl
+
+					/*
+					 * directive scope listeners
+					 */
+					$transcludeScope.$on('fa-pane-attach', function (event, child) {
+						if (child !== paneCtrl) {
+							event.stopPropagation();
+							paneCtrl.addChild(child);
+						}
+					});
+
+					$transcludeScope.$on('fa-pane-detach', function (event, child) {
+						if (child !== paneCtrl) {
+							event.stopPropagation();
+							paneCtrl.removeChild(child);
+						}
+					});
+
+					$transcludeScope.$on('$destroy', function () {
+						$transcludeScope.$emit('fa-pane-detach', paneCtrl);
+						$window.removeEventListener('resize', handleWindowResize);
+					});
 
 					scope.$emit('fa-pane-attach', paneCtrl);
 				});
