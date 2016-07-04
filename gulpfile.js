@@ -21,15 +21,15 @@ gulp.task('build', function (cb) {
 gulp.task('banner', function () {
 	var pkg = require('./package.json');
 	var banner = ['/**',
-		' * <%= pkg.name %> - <%= pkg.description %>',
-		' * @version v<%= pkg.version %>',
-		' * @link <%= pkg.homepage %>',
-		' * @license <%= pkg.license %>',
-		' */',
-		''].join('\n')
+				  ' * <%= pkg.name %> - <%= pkg.description %>',
+				  ' * @version v<%= pkg.version %>',
+				  ' * @link <%= pkg.homepage %>',
+				  ' * @license <%= pkg.license %>',
+				  ' */',
+				  ''].join('\n')
 
 	return gulp.src('dist/**.{js,css}')
-		.pipe(header(banner, {pkg: pkg}))
+		.pipe(header(banner, { pkg: pkg }))
 		.pipe(gulp.dest('dist'))
 })
 
@@ -41,10 +41,12 @@ gulp.task('build-js', ['templateCache'], function () {
 		.pipe(babel({
 			presets: ['es2015']
 		}))
-		.pipe(ngAnnotate())
+		.pipe(ngAnnotate({
+			add: true
+		}))
 		.pipe(gulp.dest('dist'))
 		.pipe(uglify())
-		.pipe(rename({suffix: '.min'}))
+		.pipe(rename({ suffix: '.min' }))
 		.pipe(gulp.dest('dist'))
 })
 
@@ -66,7 +68,7 @@ gulp.task('build-sass', function () {
 		.pipe(autoprefixer('last 5 version', '> 1%', 'ie 9'))
 		.pipe(gulp.dest('dist'))
 		.pipe(cssmin())
-		.pipe(rename({suffix: '.min'}))
+		.pipe(rename({ suffix: '.min' }))
 		.pipe(gulp.dest('dist'))
 })
 
