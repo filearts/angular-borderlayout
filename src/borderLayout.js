@@ -937,8 +937,6 @@
 				// return unless $pane
 				const $pane = scope.$pane;
 
-				const elem = element[0];
-
 				const clickRadius = 5;
 				const clickTime = 300;
 
@@ -969,11 +967,12 @@
 					}
 				});
 
-				elem.addEventListener('mousedown', function (event) {
+				element.addEventListener('mousedown', function (event) {
 					if (event.button !== 0 || event.currentTarget !== event.target || $pane.noResize) {
 						return;
 					}
 
+					const elem = event.target;
 					const anchor = $pane.anchor;
 					let coord;
 					if (anchor === 'north' || anchor === 'south') {
