@@ -4,4 +4,13 @@ node_modules
 bower_components
 test
 tests
+support
+benchmarks
+examples
 sample
+lib-cov
+coverage.html
+Makefile
+coverage
+backup
+
