@@ -630,6 +630,7 @@
 			}
 
 			this._promise = this._$timeout(function () {
+				this._$scope.$emit('fa-pane-reflow-finished', this);
 				this._$scope.$broadcast('fa-pane-reflow-finished', this);
 				this._promise = null;
 			}.bind(this), 400);
