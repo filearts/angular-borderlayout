@@ -1,6 +1,6 @@
 {
   "name": "angular-borderlayout2",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "A set of Angular.js components to manage and define border layouts",
   "main": "dist/borderLayout.js",
   "scripts": {

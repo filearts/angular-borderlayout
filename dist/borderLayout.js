@@ -1,6 +1,6 @@
 /**
  * angular-borderlayout2 - A set of Angular.js components to manage and define border layouts
- * @version v0.8.0
+ * @version v0.8.1
  * @link https://github.com/e-cloud/angular-borderlayout
  * @license MIT
  */
@@ -627,14 +627,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			this.$region = region.clone();
 			this.reflowChildren(this.$region.getInnerRegion());
 
-			if (this._promise !== null) {
-				this._$timeout.cancel(this._promise);
+			if (PaneController._promise !== null) {
+				this._$timeout.cancel(PaneController._promise);
 			}
 
-			this._promise = this._$timeout(function () {
+			PaneController._promise = this._$timeout(function () {
 				this._$scope.$emit('fa-pane-reflow-finished', this);
 				this._$scope.$broadcast('fa-pane-reflow-finished', this);
-				this._promise = null;
+				PaneController._promise = null;
 			}.bind(this), 400);
 
 			this._$scope.$broadcast('fa-pane-resize', this);
