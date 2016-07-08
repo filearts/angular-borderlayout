@@ -1,6 +1,6 @@
 /**
  * angular-borderlayout2 - A set of Angular.js components to manage and define border layouts
- * @version v0.9.0
+ * @version v0.9.1
  * @link https://github.com/e-cloud/angular-borderlayout
  * @license MIT
  */
@@ -969,7 +969,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 					}
 				});
 
-				element.addEventListener('mousedown', function (event) {
+				element.on('mousedown', function (event) {
 					if (event.button !== 0 || event.currentTarget !== event.target || $pane.noResize) {
 						return;
 					}
