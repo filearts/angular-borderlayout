@@ -967,7 +967,7 @@
 					}
 				});
 
-				element.addEventListener('mousedown', function (event) {
+				element.on('mousedown', function (event) {
 					if (event.button !== 0 || event.currentTarget !== event.target || $pane.noResize) {
 						return;
 					}
