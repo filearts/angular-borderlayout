@@ -1,16 +1,22 @@
-<div fa-pane pane-anchor="west" pane-size="50% + 2px" pane-min="200px" pane-max="50% + 2px" pane-handle="4">
-    This is a 'west' pane nested inside the center of the outer pane.
+<div fa-pane="2.1" pane-anchor="west" pane-size="50% + 4px" pane-min="200px" pane-max="50% + 4px"
+     pane-handle="{open:4, close:10}">
+	This is a 'west' pane nested inside the center of the outer pane.
 
-    <pre ng-bind="$pane.getOptions() | json"></pre>
+	<pre ng-bind="$pane.getOptions() | json"></pre>
 
-    <button ng-click="$pane.toggle()" class="btn btn-primary">Toggle</button>
+	<button ng-click="$pane.toggle()" class="btn btn-primary">Toggle</button>
 </div>
-<div fa-pane pane-anchor="south" pane-size="50% + 2px" pane-handle="4">
-    This is a 'south' pane nested inside the center of the outer layout with lower priority than the west pane.
 
-    <pre ng-bind="$pane.getOptions() | json"></pre>
+<div fa-pane="3.1" pane-anchor="south" pane-size="50% + 4px" pane-handle="4" pane-no-toggle="true">
+	<div>This is a 'south' pane nested inside the center of the outer layout with lower priority than the west pane.
+
+		<pre ng-bind="$pane.getOptions() | json"></pre>
+		<pre>
+			{{name}}
+			{{panes}}
+		</pre>
+	</div>
 </div>
-<div fa-pane pane-anchor="west">
-    <pre ng-bind="$pane.getOptions() | json"></pre>
-</div>
+<div fa-pane="3.2">
+	<pre ng-bind="$pane.getOptions() | json"></pre>
 </div>

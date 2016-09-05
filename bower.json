@@ -1,24 +1,39 @@
 {
-  "name": "angular-borderlayout",
-  "version": "0.4.2",
+  "name": "angular-borderlayout2",
+  "version": "0.9.0",
   "authors": [
-    "Geoff Goodman"
+    "Geoff Goodman",
+    "e-cloud"
   ],
   "description": "A set of Angular.js components to manage and define border layouts",
-  "main": ["src/borderLayout.js", "src/borderLayout.css"],
+  "main": [
+    "dist/borderLayout.js",
+    "dist/borderLayout.css"
+  ],
   "moduleType": [
+    "amd",
+    "CommonJS",
     "globals"
   ],
   "keywords": [
     "angular"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/filearts/angular-borderlayout",
+  "homepage": "https://github.com/e-cloud/angular-borderlayout",
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
     "test",
-    "tests"
-  ]
+    "tests",
+    "sample"
+  ],
+  "dependencies": {
+    "angular": "~1.5.0"
+  },
+  "devDependencies": {
+    "angular-route": "^1.5",
+    "bootstrap": "^3.2.0",
+    "angular-mocks": "^1.5.6"
+  }
 }
